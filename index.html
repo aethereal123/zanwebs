@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aether Situs Goblok</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co.com/fdqr7XCB/1746580723742.png">
+  <link href="https://fonts.googleapis.com/css2?family=Cal+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Creepster&display=swap" rel="stylesheet">
+  <style>
+    /* Global Variables */
+    :root {
+      --font-primary: 'Cal Sans', sans-serif;
+      --font-creepy: 'Creepster', cursive;
+
+      /* Light Theme */
+      --bg-gradient-light: linear-gradient(to bottom, #87CEEB, #f0f8ff);
+      --bg-main-light: rgba(255, 255, 255, 0.8);
+      --text-color-light: #333;
+      --heading-color-light: #007BFF;
+      --button-bg-light: #007BFF;
+      --button-text-light: #fff;
+      --button-hover-bg-light: #0056b3;
+      --widget-bg-light: rgba(0, 0, 0, 0.5);
+      --widget-text-light: white;
+      --widget-shadow-light: 0 0 10px white;
+      --calc-display-bg-light: rgba(255,255,255,0.2);
+      --calc-btn-bg-light: rgba(255,255,255,0.2);
+      --calc-btn-hover-bg-light: rgba(255,255,255,0.5);
+      --calc-clear-bg-light: rgba(255,0,0,0.7);
+      --intro-text-color-light: #333;
+      --story-text-color-light: #333; /* Initial value, can be overridden by dark mode JS logic */
+
+      /* Player Base Variables - will be overridden by specific themes */
+      --player-bg-color: #777;
+      --player-glow-color: transparent;
+      --player-text-color: white;
+      --player-main-box-bg: transparent;
+      --player-main-box-text-color: white;
+      --player-track-title-color: white;
+      --player-track-artist-color: #f0f0f0;
+      --player-time-display-color: #e0e0e0;
+      --player-seekbar-track-color: rgba(255,255,255,.3);
+      --player-seekbar-track-hover-color: rgba(255,255,255,.5);
+      --player-seekbar-thumb-color: white;
+      --player-seekbar-thumb-shadow-color: rgba(255,255,255,.9);
+      --player-button-bg: transparent;
+      --player-button-text-color: white;
+      --player-button-border-color: white;
+      --player-button-hover-bg: rgba(255,255,255,.2);
+      --player-playpause-button-bg: var(--player-seekbar-thumb-color);
+      --player-playpause-button-text-color: white; /* JS may adjust contrast */
+      --player-logo-spin-animation: spin-default; /* Default spin or none if overridden */
+
+      /* Dark Mode Toggle */
+      --dm-toggle-bg-light: #FFF;
+      --dm-toggle-border-light: #FFC107;
+      --dm-toggle-icon-bg-light: #FFC107;
+      --dm-toggle-icon-shadow-light: 0 0 10px rgba(255, 193, 7, 0.7);
+
+      /* Specific Dark Mode Toggle Styles in Dark Mode Block */
+    }
+
+    /* Default Spin Animation (can be overridden) */
+    @keyframes spin-default { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+    /* Global Styles */
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body { 
+      font-family: var(--font-primary); 
+      background: var(--bg-gradient-light); 
+      color: var(--text-color-light);
+      transition: background-color 0.5s ease, background-image 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      overflow-x: hidden; 
+      position: relative; /* For absolutely positioned children like fire-background */
+    }
+
+    /* Layout & Core Content Sections */
+    #intro { 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      text-align: center; 
+      padding: 20px; 
+      background: var(--bg-main-light); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+      opacity: 1; 
+      transition: opacity 1s ease-out, transform 1s ease-out; 
+      pointer-events: auto; /* Intro itself is interactive */
+      user-select: none; /* Make intro container itself unselectable */
+    }
+    #intro.is-exiting { 
+      opacity: 0; 
+      transform: scale(0.8) rotate(-5deg); 
+      pointer-events: none;
+    }
+    main { 
+      padding: 20px; 
+      max-width: 800px; 
+      margin: 0 auto; 
+      text-align: center; 
+      background: var(--bg-main-light); 
+      border-radius: 10px; 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+      position: relative; 
+      opacity: 0; 
+      transform: translateY(50px); 
+      display: none; /* Initially none, controlled by JS & animation */
+      pointer-events: auto; /* Main itself is interactive container */
+      user-select: none; /* Make main container itself unselectable */
+    }
+    main.is-entering { 
+      display: block !important; /* Override display:none from JS for animation */
+      animation: slideInFromBottom 0.8s ease-out forwards; 
+      animation-delay: 0.3s; 
+    }
+    @keyframes slideInFromBottom { 
+      from { opacity: 0; transform: translateY(50px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* Typography within Intro & Main */
+    #intro h1, #story h2 { 
+      font-size: 2.5rem; 
+      margin-bottom: 20px; 
+      color: var(--heading-color-light); 
+      font-weight: 700;
+      user-select: auto; /* Allow selection of headings if desired, or keep none */
+    }
+    #story h2 { font-size: 2rem; }
+    
+    /* MODIFIED RULE for #intro p and #story-text-content */
+    #intro p, #story-text-content {
+      font-size: 1.2rem; 
+      margin-bottom: 20px; 
+      line-height: 1.6;
+      color: var(--intro-text-color-light); /* Default for intro, story specific might override */
+      white-space: pre-wrap; 
+      word-wrap: break-word; 
+      overflow-wrap: break-word; 
+      -webkit-hyphens: auto; 
+      -ms-hyphens: auto;    
+      hyphens: auto;   
+      user-select: none; /* Prevent text selection */
+      pointer-events: none; /* Prevent clicks on the text paragraph itself */
+    }
+    #story-text-content {
+        text-align: left; 
+        color: var(--story-text-color-light); /* Specific for story text */
+        /* user-select and pointer-events are inherited from the rule above or this can be more specific if needed */
+    }
+    
+    /* Buttons & Interactive elements should remain selectable/clickable */
+    button, a, img, input[type="range"], input[type="text"], textarea, label,
+    select, details, summary, [contenteditable="true"], [tabindex]:not([tabindex="-1"]) { 
+      pointer-events: auto; 
+      user-select: auto; /* Or text for input fields */
+      cursor: pointer; 
+    }
+    input[type="text"], textarea { /* Specific for text input selection */
+        user-select: text;
+        cursor: text;
+    }
+
+    #intro button, #next-button { 
+      background: var(--button-bg-light); 
+      color: var(--button-text-light); 
+      border: none; 
+      padding: 10px 20px; 
+      font-size: 1rem; 
+      font-family: inherit; 
+      border-radius: 5px; 
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      /* pointer-events and user-select are already handled by the general rule above */
+    }
+    #intro button:hover, #next-button:hover:not(:disabled) { 
+      background: var(--button-hover-bg-light); 
+      transform: scale(1.05); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    #next-button:disabled {
+        background-color: #cccccc !important; 
+        color: #666666 !important;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+
+    /* AetherX Logo */
+    #aetherx-logo { 
+      /* cursor: pointer; Removed, as <a> tag handles it */
+      width: 100px; 
+      height: auto; 
+      animation: pulseLogo 2.5s infinite ease-in-out; 
+      margin-bottom: 20px; 
+      transition: filter 0.3s ease;
+       /* pointer-events and user-select already auto from general rule */
+    }
+    #aetherx-link:hover #aetherx-logo { /* Apply hover effect to logo when link is hovered */
+      filter: drop-shadow(0 0 15px rgba(120, 190, 255, 1));
+    }
+    @keyframes pulseLogo { 
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(75,150,255,.5)); } 
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(100,175,255,.8)); } 
+    }
+
+    /* Dark Mode Toggle */
+    #dark-mode-toggle {
+      position: fixed; top: 10px; left: 10px; z-index: 1001; 
+      background-color: var(--dm-toggle-bg-light);
+      border: 2px solid var(--dm-toggle-border-light); 
+      border-radius: 50%; width: 48px; height: 48px;
+      /* cursor: pointer; - handled by general button rule */
+      outline: none; display: flex; justify-content: center; align-items: center;
+      transition: background-color 0.5s ease, border-color 0.5s ease, transform 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); overflow: hidden;
+      /* pointer-events: auto; - handled by general button rule */
+    }
+    #dark-mode-toggle:hover { transform: scale(1.1) rotate(15deg); }
+    #dark-mode-toggle .toggle-icon {
+      display: block; width: 24px; height: 24px; border-radius: 50%;
+      background-color: var(--dm-toggle-icon-bg-light); 
+      position: relative;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      box-shadow: var(--dm-toggle-icon-shadow-light);
+      pointer-events: none; /* Icon itself is not interactive */
+    }
+
+    /* Widgets (Date/Time, Calculator) */
+    .widget {
+      position: fixed; 
+      font-family: var(--font-primary); 
+      color: var(--widget-text-light);
+      background: var(--widget-bg-light); 
+      padding: 10px; border-radius: 5px;
+      box-shadow: var(--widget-shadow-light); 
+      z-index: 1000; 
+      user-select: none; /* Widget container not selectable */
+      text-align: center;
+      backdrop-filter: blur(5px); 
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      pointer-events: auto; /* Widgets themselves are interactive containers */
+    }
+    .widget * { /* Children that are interactive default to these properties */
+        pointer-events: auto; 
+        user-select: auto; 
+    }
+
+    #date-time-logo { 
+      top: 10px; left: 70px; font-size: 1.2rem; padding: 5px 10px;
+    }
+    #countdown { 
+      font-size: 0.9rem; text-shadow: 0 0 5px var(--widget-text-light); margin-top: 5px; 
+      user-select: none; pointer-events: none; /* Countdown text not interactive */
+    }
+    #calculator { 
+      top: 10px; right: 10px; width: 200px; font-size: 1rem; 
+    }
+    #calc-display { 
+      background: var(--calc-display-bg-light); 
+      font-size: 1.5rem; padding: 10px; border-radius: 5px; 
+      margin-bottom: 10px; text-align: right; 
+      box-shadow: inset 0 0 5px var(--widget-text-light);
+      min-height: 2.5em; 
+      line-height: 1.5em;
+      word-break: break-all; 
+      user-select: none; pointer-events: none; /* Display not interactive */
+    }
+    #calc-buttons { 
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; 
+    }
+    #calc-buttons button { 
+      background: var(--calc-btn-bg-light); 
+      font-size: 1rem; padding: 10px; border: none; border-radius: 5px; 
+      /* cursor: pointer; - handled by general button rule */
+      box-shadow: 0 0 5px var(--widget-text-light); 
+      transition: background-color 0.3s ease, transform 0.1s ease; 
+      color: var(--widget-text-light); 
+      font-family: var(--font-primary);
+      font-weight: bold;
+      /* pointer-events, user-select auto from general rule */
+    }
+    #calc-buttons button:hover { 
+      background: var(--calc-btn-hover-bg-light); 
+      transform: translateY(-1px);
+    }
+    #calc-buttons button:active {
+      transform: translateY(1px);
+    }
+    #calc-buttons #clear { 
+      grid-column: span 4; background: var(--calc-clear-bg-light); 
+    }
+
+    /* Scary Overlay & Fire Background */
+    #scary-text-overlay, #fire-background { 
+      user-select: none; 
+      pointer-events: none; 
+    }
+    #scary-text-overlay { 
+      position: fixed; top: 50%; left: 50%; 
+      transform: translate(-50%, -50%); 
+      font-family: var(--font-creepy); 
+      font-size: 5rem; color: red; 
+      text-shadow: 0 0 10px red,0 0 20px red,0 0 30px red; 
+      z-index: 20000; display: none; 
+      animation: fadeInOutScary 0.5s ease-in-out;
+    }
+    @keyframes fadeInOutScary {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    }
+    #fire-background { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      overflow: hidden; z-index: -2; 
+      background: var(--bg-gradient-light); 
+    }
+    .fire-number { 
+      position: absolute; font-size: 2rem; font-family: var(--font-primary); 
+      color: white; text-shadow: 0 0 10px white,0 0 20px white,0 0 30px white; 
+      animation: rise 3s linear infinite, flicker 0.1s infinite; 
+    }
+    @keyframes rise { 
+      0% { transform: translateY(100vh) scale(1); opacity: 1; } 
+      100% { transform: translateY(-10vh) scale(0.5); opacity: 0; } 
+    }
+    @keyframes flicker { 
+      0%, 100% { opacity: 0.8; } 
+      50% { opacity: 1; } 
+    }
+
+    /* Base Music Player Styles */
+    .music-player-container {
+      display: none; /* Shown by JS */
+      align-items: center;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 30px auto;
+      font-family: var(--font-primary);
+      width: 95%;
+      max-width: 420px;
+      background: var(--player-bg-color); 
+      color: var(--player-text-color); 
+      box-shadow: var(--player-glow-color) 0px 0px 15px, var(--player-glow-color) 0px 0px 20px, var(--player-glow-color) 0px 0px 30px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+      pointer-events: auto; 
+      user-select: none; /* Player container not selectable, children can be */
+    }
+    .player-logo-wrapper { 
+      position: relative; width: 70px; height: 70px; 
+      margin-right: 20px; flex-shrink: 0; 
+      user-select: auto; pointer-events: auto; /* Wrapper is part of clickable logo */
+    }
+    .player-logo-background { 
+      width: 100%; height: 100%; 
+      background-color: rgba(255,255,255,.2); 
+      border-radius: 50%; 
+      position: absolute; top: 0; left: 0; z-index: 1; 
+      box-shadow: 0 0 10px rgba(255,255,255,.3); 
+      pointer-events: none; /* Background circle not directly interactive */
+    }
+    .player-logo-background.playing { 
+      animation-name: var(--player-logo-spin-animation);
+      animation-duration: 3s; 
+      animation-timing-function: linear; 
+      animation-iteration-count: infinite; 
+    }
+    /* Specific Spin Animations, referenced by --player-logo-spin-animation */
+    @keyframes spin-fuchsia  { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    @keyframes spin-emerald  { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    @keyframes spin-burgundy { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    @keyframes spin-ivory    { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    @keyframes spin-secret-song-player { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    
+    .player-aetherx-logo { /* This is an <img> tag */
+      width: 85%; height: 85%; 
+      position: absolute; top: 50%; left: 50%; 
+      transform: translate(-50%, -50%); 
+      border-radius: 50%; z-index: 2; 
+       /* pointer-events and user-select auto from general img rule */
+    }
+    .player-main { 
+      width: 100%; display: flex; flex-direction: column; 
+      align-items: center; flex-grow: 1; 
+      background-color: var(--player-main-box-bg); 
+      color: var(--player-main-box-text-color); 
+      padding: 15px; border-radius: 10px; 
+      box-shadow: inset 0 0 10px rgba(0,0,0,.1); 
+      pointer-events: none; /* Main player section not directly interactive */
+      user-select: none;
+    }
+    .track-info { 
+      text-align: center; margin-bottom: 10px; min-height: 45px; 
+      user-select: none; pointer-events: none; /* Text, not interactive */
+    }
+    .track-info span:first-child { 
+      font-size: 1.1rem; font-weight: bold; display: block; 
+      color: var(--player-track-title-color); 
+    }
+    .track-info span:last-child { 
+      font-size: .9rem; 
+      color: var(--player-track-artist-color); 
+    }
+    .player-seek-bar { /* This is an input[type="range"] */
+      width: 100%; margin: 10px 0; /* cursor: pointer; auto */
+      -webkit-appearance: none; appearance: none; 
+      height: 8px; border-radius: 4px; outline: none; 
+      transition: background .2s ease; 
+      background: var(--player-seekbar-track-color); 
+       /* pointer-events and user-select auto from general input rule */
+    }
+    .player-seek-bar:hover {
+      background: var(--player-seekbar-track-hover-color); 
+    }
+    .player-seek-bar::-webkit-slider-thumb { 
+      -webkit-appearance: none; appearance: none; 
+      width: 16px; height: 16px; border-radius: 50%; 
+      background: var(--player-seekbar-thumb-color); 
+      box-shadow: 0 0 8px var(--player-seekbar-thumb-shadow-color); 
+    }
+    .player-seek-bar::-moz-range-thumb { 
+      width: 16px; height: 16px; border-radius: 50%; border: none; 
+      background: var(--player-seekbar-thumb-color); 
+      box-shadow: 0 0 8px var(--player-seekbar-thumb-shadow-color); 
+    }
+    .time-display { 
+      font-size: .8rem; width: 100%; display: flex; 
+      justify-content: space-between; padding: 0 5px; margin-bottom: 15px; 
+      color: var(--player-time-display-color); 
+      user-select: none; pointer-events: none; /* Text, not interactive */
+    }
+    .player-controls { 
+      display: flex; justify-content: center; align-items: center; gap: 20px; 
+      pointer-events: auto; user-select: none; /* Container for buttons is interactive */
+    }
+    .player-controls button { /* These are <button> */
+      font-size: 1.3rem; /* cursor: pointer; - auto */
+      padding: 8px; 
+      border-radius: 50%; width: 40px; height: 40px; 
+      display: flex; justify-content: center; align-items: center; 
+      transition: background-color .2s ease,transform .2s ease,box-shadow .2s ease; 
+      background: var(--player-button-bg); 
+      border: 1px solid var(--player-button-border-color); 
+      color: var(--player-button-text-color); 
+      box-shadow: 0 0 5px var(--player-button-border-color); 
+       /* pointer-events and user-select auto from general button rule */
+    }
+    .player-controls button:hover:not(:disabled) { 
+      transform: scale(1.1); 
+      background-color: var(--player-button-hover-bg); 
+      box-shadow: 0 0 10px var(--player-button-border-color); 
+    }
+    .player-controls button.play-pause-btn { 
+      font-size: 1.8rem; width: 50px; height: 50px;
+      background: var(--player-playpause-button-bg); 
+      color: var(--player-playpause-button-text-color); 
+    }
+    .player-controls button.play-pause-btn:hover:not(:disabled) {
+       filter: brightness(1.1);
+    }
+    .player-controls button:disabled { 
+      opacity: .5; cursor: not-allowed; box-shadow: none; transform: none;
+    }
+
+    /* YouTube Video Overlay */
+    #youtube-video-overlay { 
+      position:fixed; top:0; left:0; width:100vw; height:100vh; 
+      background-color:black; z-index:30000; 
+      display:none; justify-content:center; align-items:center; overflow:hidden;
+      pointer-events:auto; /* Overlay itself captures clicks, might need review */
+    }
+    #youtube-player-container { 
+      width:100%; height:100%; position:relative; 
+      pointer-events:none; /* Let YT player handle interactions */
+    } 
+    #youtube-player-container iframe { 
+      position:absolute; top:0; left:0; width:100%; height:100%; border:0; 
+      pointer-events:auto; /* YT iframe is interactive */
+    }
+
+    /* Morse Code Overlay */
+    #morse-code-overlay { 
+      position:fixed; top:0; left:0; width:100%; height:100%; 
+      background-color:rgba(0,0,0,.9); color:red; 
+      font-family:'Courier New',Courier,monospace; font-size:1.5rem; 
+      display:none; justify-content:center; align-items:center; text-align:center; 
+      z-index:40000; padding:20px; white-space:pre-wrap; 
+      line-height:1.6; opacity:0; animation:fadeInMorse .5s forwards;
+      pointer-events:auto; 
+      user-select:text; /* Allow copying Morse if desired */
+    }
+    @keyframes fadeInMorse { to { opacity:1 } }
+
+    /* === Dark Mode === */
+    body.dark-mode {
+      --bg-gradient-dark: none; 
+      --bg-color-dark: #121212;
+      --bg-main-dark: #1e1e1e;
+      --text-color-dark: #e0e0e0;
+      --heading-color-dark: #bb86fc;
+      --button-bg-dark: #3700b3; 
+      --button-text-dark: #e0e0e0; 
+      --button-hover-bg-dark: #2a008c;
+      --widget-bg-dark: rgba(40,40,40,.85); 
+      --widget-text-dark: #e0e0e0;
+      --widget-shadow-dark: 0 0 10px rgba(200,200,200,.3);
+      --calc-display-bg-dark: rgba(80,80,80,.5); 
+      --calc-btn-bg-dark: rgba(80,80,80,.5);
+      --calc-btn-hover-bg-dark: rgba(100,100,100,.7);
+      --calc-clear-bg-dark: rgba(170,0,0,0.85); 
+      --intro-text-color-dark: #b0b0b0;
+      --story-text-color-dark: #b0b0b0; /* Morse will be set by JS, this is fallback if original HTML is shown */
+
+      --dm-toggle-bg-dark: #2c3e50;
+      --dm-toggle-border-dark: #76abcf;
+      --dm-toggle-icon-shadow-dark: 0 0 10px rgba(224, 224, 224, 0.5);
+
+      --player-main-box-bg-dark: #2a2a2a;
+      --player-main-box-text-color-dark: #e0e0e0;
+      --player-track-title-color-dark: #bb86fc;
+      --player-track-artist-color-dark: #b0b0b0;
+      --player-time-display-color-dark: #b0b0b0;
+    }
+    body.dark-mode { 
+      background-image: var(--bg-gradient-dark); 
+      background-color: var(--bg-color-dark); 
+      color: var(--text-color-dark); 
+    }
+    body.dark-mode #fire-background { 
+      background-image: var(--bg-gradient-dark); 
+      background-color: var(--bg-color-dark); 
+    }
+    body.dark-mode #intro, body.dark-mode main { 
+      background: var(--bg-main-dark); 
+      box-shadow:0 4px 8px rgba(255,255,255,.05); 
+    }
+    body.dark-mode #intro h1, body.dark-mode #story h2 { 
+      color: var(--heading-color-dark); 
+    }
+    body.dark-mode #intro button, body.dark-mode #next-button { 
+      color: var(--button-text-dark); 
+      background: var(--button-bg-dark); 
+    }
+     body.dark-mode #intro p { /* Text color is part of #intro p rule, using CSS vars */
+      color: var(--intro-text-color-dark);
+    }
+    
+    body.dark-mode #intro button:hover, body.dark-mode #next-button:hover:not(:disabled) { 
+      background: var(--button-hover-bg-dark); 
+    }
+    body.dark-mode .widget { 
+      background: var(--widget-bg-dark); 
+      color: var(--widget-text-dark);
+      box-shadow: var(--widget-shadow-dark); 
+    }
+    body.dark-mode #countdown { text-shadow: 0 0 5px var(--widget-text-dark); }
+    body.dark-mode #calc-display { 
+      background: var(--calc-display-bg-dark); 
+      box-shadow: inset 0 0 5px var(--widget-text-dark); 
+    }
+    body.dark-mode #calc-buttons button { 
+      background: var(--calc-btn-bg-dark); 
+      color: var(--widget-text-dark);
+      box-shadow:0 0 5px rgba(200,200,200,.2); 
+    }
+    body.dark-mode #calc-buttons button:hover { 
+      background: var(--calc-btn-hover-bg-dark); 
+    }
+    body.dark-mode #calc-buttons #clear { 
+      background: var(--calc-clear-bg-dark); 
+    }
+    body.dark-mode #dark-mode-toggle { 
+      background-color: var(--dm-toggle-bg-dark); 
+      border-color: var(--dm-toggle-border-dark); 
+      box-shadow: 0 2px 8px rgba(255,255,255,0.1); 
+    }
+    body.dark-mode #dark-mode-toggle .toggle-icon {
+      background-color: transparent; width: 20px; height: 20px; border: 5px solid #E0E0E0;
+      border-left-color: transparent; border-top-color: transparent;
+      transform: translateX(5px) rotate(45deg); 
+      box-shadow: var(--dm-toggle-icon-shadow-dark);
+    }
+    body.dark-mode .player-main {
+        background-color: var(--player-main-box-bg-dark, var(--player-main-box-bg));
+        color: var(--player-main-box-text-color-dark, var(--player-main-box-text-color));
+    }
+    body.dark-mode .track-info span:first-child {
+        color: var(--player-track-title-color-dark, var(--player-track-title-color));
+    }
+    body.dark-mode .track-info span:last-child {
+        color: var(--player-track-artist-color-dark, var(--player-track-artist-color));
+    }
+    body.dark-mode .time-display {
+        color: var(--player-time-display-color-dark, var(--player-time-display-color));
+    }
+
+    body.dark-mode .player-controls-emerald button, body.dark-mode .player-controls-burgundy button, body.dark-mode .player-controls-ivory button, body.dark-mode .player-controls-secret-song-player button { background:#3c3c3c; border-color:#555; color:#e0e0e0; }
+    body.dark-mode .player-controls-emerald button:hover:not(:disabled), body.dark-mode .player-controls-burgundy button:hover:not(:disabled), body.dark-mode .player-controls-ivory button:hover:not(:disabled), body.dark-mode .player-controls-secret-song-player button:hover:not(:disabled) { background-color:#4f4f4f; }
+    body.dark-mode .player-controls-emerald button#play-pause-button-emerald.play-pause-btn { background-color:#388E3C; } 
+    body.dark-mode .player-controls-burgundy button#play-pause-button-burgundy.play-pause-btn { background-color:#6A001A; }
+    body.dark-mode .player-controls-ivory button#play-pause-button-ivory.play-pause-btn { background-color:#607D8B; }
+
+    #player-logo-wrapper-emerald, #player-logo-wrapper-burgundy, #player-logo-wrapper-ivory, #player-logo-wrapper-secret-song-player {
+        width:75px; height:75px;
+    }
+    #player-logo-background-emerald { background-color:rgba(255,255,255,.15); box-shadow:0 0 8px rgba(255,255,255,.2);}
+    #player-logo-background-burgundy { background-color:rgba(255,255,255,.1); box-shadow:0 0 8px rgba(255,255,255,.2); }
+    #player-logo-background-ivory { background-color:rgba(0,0,0,.05); box-shadow:0 0 8px rgba(0,0,0,.1); }
+    #player-logo-background-secret-song-player { background-color:rgba(255,255,255,.15); box-shadow:0 0 8px rgba(255,255,255,.2); }
+
+   
+    .player-controls-emerald button { background:#ecf0f1; border:1px solid #bdc3c7; color:#2c3e50; box-shadow:0 2px 5px rgba(0,0,0,.1); width:42px; height:42px; }
+    .player-controls-emerald button:hover:not(:disabled) { background-color:#dde4e6; box-shadow:0 0 10px rgba(46,204,113,.5); }
+    .player-controls-emerald button#play-pause-button-emerald.play-pause-btn { width:52px; height:52px; background-color:#2ecc71; color:white; }
+    .player-controls-emerald button#play-pause-button-emerald.play-pause-btn:hover:not(:disabled) { background-color:#27ae60; }
+
+    .player-controls-burgundy button { background:#f5e6ea; border:1px solid #d1bec4; color:#600018; box-shadow:0 2px 5px rgba(0,0,0,.1); width:42px; height:42px;}
+    .player-controls-burgundy button#play-pause-button-burgundy.play-pause-btn { background-color:#800020; color:white; }
+
+    .player-controls-ivory button { background:#e8e8e0; border:1px solid #dcdcdc; color:#404040; box-shadow:0 2px 5px rgba(0,0,0,.1); width:42px; height:42px;}
+    .player-controls-ivory button#play-pause-button-ivory.play-pause-btn { background-color:#808078; color:white; }
+
+    /* Responsive Design */
+    @media (max-width:768px){
+      body { padding:10px; display:flex; flex-direction:column; align-items:center; }
+      main, #intro { order:3; width:100%; margin-top:10px; }
+      #dark-mode-toggle { position:static; order:-3; margin:0 auto 15px auto; } 
+      #date-time-logo.widget { position:static; order:-2; margin:0 auto 15px auto; width:90%; max-width:250px; }
+      #calculator.widget { position:static; order:-1; margin:0 auto 15px auto; width:90%; max-width:250px; }
+      
+      #intro h1 { font-size:2rem; }
+      #intro p { font-size:1rem; }
+      #story h2 { font-size:1.5rem; }
+      #story-text-content { font-size:1rem; } 
+
+      .music-player-container { 
+        flex-direction:column; align-items:center; 
+        max-width:90%; margin-top:15px; margin-bottom:15px; 
+      }
+      .player-logo-wrapper { margin-right:0; margin-bottom:15px; }
+      .player-main { width:100%; padding:10px; }
+      #scary-text-overlay { font-size: 3rem; }
+    }
+
+    @media (max-width: 480px) {
+        #calc-display { font-size: 1.3rem; }
+        #calc-buttons button { font-size: 0.9rem; padding: 8px; }
+        #intro h1, #story h2 { font-size: 1.5rem; } 
+        #intro p, #story-text-content { font-size: 0.9rem; }
+    }
+
+  </style>
+</head>
+<body>
+  <button id="dark-mode-toggle" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+    <span class="toggle-icon"></span>
+  </button>
+
+  <div id="date-time-logo" class="widget" title="Date and Time">
+    <!-- Content populated by JS -->
+    <div id="countdown">Initializing countdown...</div>
+  </div>
+
+  <div id="calculator" class="widget" title="Calculator">
+    <div id="calc-display">0</div>
+    <div id="calc-buttons">
+      <button>7</button><button>8</button><button>9</button><button>/</button>
+      <button>4</button><button>5</button><button>6</button><button>*</button>
+      <button>1</button><button>2</button><button>3</button><button>-</button>
+      <button>0</button><button>.</button><button>=</button><button>+</button>
+      <button id="clear">C</button>
+    </div>
+  </div>
+  
+  <div id="fire-background"></div>
+  <div id="scary-text-overlay">..--- .---- ..... .---- -----</div>
+  
+  <section id="intro">
+    <h1>Salve. Mihi nomen est Aether.</h1>
+    <p id="intro-paragraph">
+      Non nomen verum, sed hoc nomen satis est ut ostendam quis vere sim in mundo invisibili.<br><br>
+      Non crevi in domo plena velocitate interretiali aut ornamentis pulchris.<br>
+      Crescebam inter funes electricos disruptos, auriculares fractos, et horologium cybercafei quod cordi meo timorem incutiebat.<br><br>
+      Per diem ephemerides vendebam ut panem familiae pararem. Nocte in taberna interretiali manebam, studens codici, ludis electronicis, et quaestionibus quae iustitiam tangunt.<br><br>
+      Non semel in solo dormivi, velut statua muta, dum codicem scribebam.<br><br>
+      Sed ibi didici multa:<br>
+      Quomodo cogitatio simplex systema magnum movere possit.<br>
+      Quomodo puer ignotus potest fieri vox contra iniustitiam.<br>
+      Et quomodo matri explicari debeat quod programmare non est peccatum.<br><br>
+      Hodie ego non sum vir clarus. Sed fabula quam fero fortasse tua quoque est.<br>
+      In strepitu claviaturae antiqui computatri, invenitur vox eorum qui saepe neglecti sunt.
+    </p>
+    <button id="start-story">Lanjutkan</button>
+  </section>
+
+  <main>
+    <section id="story">
+      <a id="aetherx-link" href="https://forms.gle/VzLHyZP4JiybKRar5" target="_blank" rel="noopener noreferrer">
+        <img id="aetherx-logo" src="https://i.ibb.co.com/9HGYdT1Z/aether2.png" alt="Logo AetherX">
+      </a>
+      <h2>Ego, Puer Interneti, et Cicatrices Manentes</h2>
+      <p id="story-text-content">
+        <br>¦€âeuqsu</br>
+        <br>"tse autrom aem mailif" mutcid illi</br>
+        <br>¦€âmumitlu mitanmad euqsu</br>
+        <br>"tse autrom aem mailif" ivacov suem retap</br>
+        <br>metrap tse matlupes manu</br>
+        <br>tse autrom ila te</br>
+        <br>ut te</br>
+        <br>autrom maite”€âainmo ibit te</br>
+        <br>et te</br>
+        <br>alli te</br>
+        <br>edroc ni sibicud sitluts a</br>
+        <br>tenretni a</br>
+        <br>aem alohcs a</br>
+        <br>alohcs anrecul tnus mauqmun</br>
+        <br>terepmurretni metnerap iuq irue mubmun patem tu des</br>
+        <br>matep maidrociresim tu non obircs coh</br>
+        <br>rutidua satirev sutad</br>
+        <br>sanitatem tertni eauq taps ativ ed des”€âirileurep eroma erede non</br>
+        <br>non alohcs onedo</br>
+        <br>tnus sutnauq mauqmun senoissim mauqila</br>
+        <br>cnun</br>
+        <br>muus eropmet asnem ni sarep sunis manips atcer sitnegilletni muem retarf</br>
+        <br>oebah iem retam malos</br>
+        <br>tebed erenitsus iuq</br>
+        <br>mus oge</br>
+        <br>merof emaf mudretni miretni</br>
+        <br>easocoi ealubaf suem rolod isauq”€âsusserppo susulcxe suiredised</br>
+        <br>mus lihin</br>
+        <br>alohcs ni te</br>
+        <br>manosrep nemon sutreporp</br>
+        <br>sutsuni mat</br>
+        <br>tedis meidbus muroloc ihim eauq malleup</br>
+        <br>alohcs menoitadilav da cavarp ie ivarap sunu snum</br>
+        <br>tipeoc gniyllubrebyc ba em mabednefed</br>
+        <br>igel suie satpircs</br>
+        <br>mus lihin</br>
+        <br>alohcs ni te</br>
+        <br>manosrep sunu sutreporp</br>
+        <br>atcarf tse aem ativ</br>
+        <br>tse arebrev tes tabarever tiledurc anu tare retam</br>
+        <br>retam</br>
+        <br>tare aem retam”€âatcarf tse aem ativ</br>
+        <br>¦€âaem retam te</br>
+        <br>muigufer tse repmes non sumod</br>
+        <br>ivics otnemom olli xe</br>
+        <br>angup amissitnelis tset sumus mudnaliuqa</br>
+        <br>cnun</br>
+        <br>muus eropmet asnem ni sarep sunis manips atcer sitnegilletni muem retarf</br>
+        <br>oebah iem retam malos</br>
+        <br>tebed erenitsus iuq</br>
+        <br>mus oge</br>
+        <br>merof emaf eidemretni mudretni</br>
+        <br>easocoi ealubaf suem rolod isauq”€âsusserppo susulcxe suorised</br>
+        <br>mus lihin</br>
+        <br>alohcs ni tse</br>
+        <br>meid esse maipulsorp mulos non</br>
+        <br>maem aiv epoc ipeoc ibi</br>
+        <br>mabamalac et siromalc banimun mud</br>
+        <br>essecca eaem sirclupes messe muc des</br>
+        <br>iutop erepicsus medif suilpma illun</br>
+        <br>eid olli xe</br>
+        <br>tenam oem edroc ni amuart</br>
+        <br>oebah nemin</br>
+        <br>maem marteper</br>
+        <br>aitnatsni tse ihim</br>
+        <br>tnus enoisivelet ni eauq auqitna aiuqolloc et eaigiler mairomem etrep</br>
+        <br>tnus itnatser ihim</br>
+        <br>tnus cnih inmo tnus</br>
+        <br>nonohpelet otsutev auqitna aiuqol mauqitna te meromem macuder tu des</br>
+        <br>maitucreper tu non”€âixerrus</br>
+        <br>tnus easualc saresu senmo muc</br>
+        <br>oitnelis olli ni te</br>
+        <br>tse enif enif tse sinoitcon aidem</br>
+        <br>mutrepa mauqmun odnum ni isauq</br>
+        <br>tare muem roc</br>
+        <br>tnuredicec maem mamina maupesrep</br>
+        <br>tidicec mamirepus maem emissid mareeneb</br>
+        <br>tse autrom alli mauqtsop ropmet</br>
+        <br>tivatum et</br>
+        <br>tidicec maem mamirepus emissisned sarbenet</br>
+        <br>tse autrom aill mauq tsop ropmet</br>
+        <br>tuitop esse made mureti mauqmun</br>
+        <br>atcarf tsemel maem mativ</br>
+        <br>tse atcarf aem ativ</br>
+        <br>mus meledif esse</br>
+        <br>iutop non</br>
+        <br>aititsui ni odnum ni</br>
+        <br>senimoh ni aem sedif</br>
+        <br>meid esse maipulsorp mulos non</br>
+        <br>erereauq maem maiv ipeoc ibi</br>
+        <br>mabamalc sutsni des tnadiber snenimoh</br>
+        <br>tnus atcarf ainmo”€âaititsui ni odnum ni senimoh ni</br>
+        <br>ledif esse sumid esse medi siulpma iutop non</br>
+        <br>teralever maem mamimac et maem mativ eauq</br>
+        <br>teregeted siratilim salam sanosrep et teralever metatirev des tiurappa airolg orp non</br>
+        <br>iitnelis iaugnil rutabeuqol murcaro enimalusni odnum ilaer ni</br>
+        <br>titsixe xiv sitnegilletni muem rolod tse siuq oicsen</br>
+        <br>eranos ihim sutogni iuq suio siuqse</br>
+        <br>tnediv dicuap mauq tatlucco etrap ni tseretni sirbmu ni</br>
+        <br>tivatam eauqiler satirev tamun tu tidnecsed odnuforp ni rotacipsus isauq</br>
+        <br>itcartxe lucem mecul da ainmo</br>
+        <br>erede saslaf senoitater te</br>
+        <br>erarepucer sateled salubat sosonenev soiratnemmoc ni tiutop</br>
+        <br>mus sutuces igel suie eatpircs</br>
+        <br>mue sius metrom tsop iamet</br>
+        <br>eter ni eratlusni cuhda atuca acima nemon erediv tesse diuq tecirts sudnum ut iulov</br>
+        <br>isnes oge meuq merolod tiritnes ut iulov</br>
+        <br>tidotsuc muluvlup retarf mud tatlucsua aogretam metcon iuq reep ut ni euq</br>
+        <br>mitciv ut ereviv tesse diuq tercs sumdun tu isulov</br>
+       </p>
+      <button id="next-button">Lanjutkan</button>
+      
+      <!-- Music Players -->
+      <div id="music-player-container-fuchsia" class="music-player-container">
+        <div id="player-logo-wrapper-fuchsia" class="player-logo-wrapper">
+          <div id="player-logo-background-fuchsia" class="player-logo-background"></div>
+          <img src="https://i.ibb.co.com/9HGYdT1Z/aether2.png" alt="AetherX Logo" id="player-aetherx-logo-fuchsia" class="player-aetherx-logo">
+        </div>
+        <div class="player-main player-main-fuchsia">
+          <div class="track-info track-info-fuchsia">
+            <span id="track-title-fuchsia">Memuat...</span><span id="track-artist-fuchsia"></span>
+          </div>
+          <input type="range" id="seek-bar-fuchsia" class="player-seek-bar" value="0" step="1" aria-label="Seek bar for Fuchsia player">
+          <div class="time-display time-display-fuchsia">
+            <span id="current-time-fuchsia">0:00</span> / <span id="total-duration-fuchsia">0:00</span>
+          </div>
+          <div class="player-controls player-controls-fuchsia">
+            <button id="prev-button-fuchsia" title="Previous Player" aria-label="Previous Player">«</button>
+            <button id="play-pause-button-fuchsia" class="play-pause-btn" title="Play" aria-label="Play or Pause Fuchsia player">►</button>
+            <button id="next-button-fuchsia" title="Next Player" aria-label="Next Player">»</button>
+          </div>
+        </div>
+        <audio id="audio-player-fuchsia" preload="metadata"></audio>
+      </div>
+
+      <div id="music-player-container-emerald" class="music-player-container">
+        <div id="player-logo-wrapper-emerald" class="player-logo-wrapper">
+          <div id="player-logo-background-emerald" class="player-logo-background"></div>
+          <img src="https://i.ibb.co.com/9HGYdT1Z/aether2.png" alt="AetherX Logo" id="player-aetherx-logo-emerald" class="player-aetherx-logo">
+        </div>
+        <div class="player-main player-main-emerald">
+          <div class="track-info track-info-emerald">
+            <span id="track-title-emerald"></span><span id="track-artist-emerald"></span>
+          </div>
+          <input type="range" id="seek-bar-emerald" class="player-seek-bar" value="0" step="1" aria-label="Seek bar for Emerald player">
+          <div class="time-display time-display-emerald">
+            <span id="current-time-emerald">0:00</span> / <span id="total-duration-emerald">0:00</span>
+          </div>
+          <div class="player-controls player-controls-emerald">
+            <button id="prev-button-emerald" title="Previous Player" aria-label="Previous Player">«</button>
+            <button id="play-pause-button-emerald" class="play-pause-btn" title="Play" aria-label="Play or Pause Emerald player">►</button>
+            <button id="next-button-emerald" title="Next Player" aria-label="Next Player">»</button>
+          </div>
+        </div>
+        <audio id="audio-player-emerald" preload="metadata"></audio>
+      </div>
+
+      <div id="music-player-container-burgundy" class="music-player-container">
+        <div id="player-logo-wrapper-burgundy" class="player-logo-wrapper">
+          <div id="player-logo-background-burgundy" class="player-logo-background"></div>
+          <img src="https://i.ibb.co.com/9HGYdT1Z/aether2.png" alt="AetherX Logo" id="player-aetherx-logo-burgundy" class="player-aetherx-logo">
+        </div>
+        <div class="player-main player-main-burgundy">
+          <div class="track-info track-info-burgundy">
+            <span id="track-title-burgundy"></span><span id="track-artist-burgundy"></span>
+          </div>
+          <input type="range" id="seek-bar-burgundy" class="player-seek-bar" value="0" step="1" aria-label="Seek bar for Burgundy player">
+          <div class="time-display time-display-burgundy">
+            <span id="current-time-burgundy">0:00</span> / <span id="total-duration-burgundy">0:00</span>
+          </div>
+          <div class="player-controls player-controls-burgundy">
+            <button id="prev-button-burgundy" title="Previous Player" aria-label="Previous Player">«</button>
+            <button id="play-pause-button-burgundy" class="play-pause-btn" title="Play" aria-label="Play or Pause Burgundy player">►</button>
+            <button id="next-button-burgundy" title="Next Player" aria-label="Next Player">»</button>
+          </div>
+        </div>
+        <audio id="audio-player-burgundy" preload="metadata"></audio>
+      </div>
+
+      <div id="music-player-container-ivory" class="music-player-container">
+        <div id="player-logo-wrapper-ivory" class="player-logo-wrapper">
+          <div id="player-logo-background-ivory" class="player-logo-background"></div>
+          <img src="https://i.ibb.co.com/9HGYdT1Z/aether2.png" alt="AetherX Logo" id="player-aetherx-logo-ivory" class="player-aetherx-logo">
+        </div>
+        <div class="player-main player-main-ivory">
+          <div class="track-info track-info-ivory">
+            <span id="track-title-ivory"></span><span id="track-artist-ivory"></span>
+          </div>
+          <input type="range" id="seek-bar-ivory" class="player-seek-bar" value="0" step="1" aria-label="Seek bar for Ivory player">
+          <div class="time-display time-display-ivory">
+            <span id="current-time-ivory">0:00</span> / <span id="total-duration-ivory">0:00</span>
+          </div>
+          <div class="player-controls player-controls-ivory">
+            <button id="prev-button-ivory" title="Previous Player" aria-label="Previous Player">«</button>
+            <button id="play-pause-button-ivory" class="play-pause-btn" title="Play" aria-label="Play or Pause Ivory player">►</button>
+            <button id="next-button-ivory" title="Next Player" aria-label="Next Player">»</button>
+          </div>
+        </div>
+        <audio id="audio-player-ivory" preload="metadata"></audio>
+      </div>
+
+      <div id="music-player-container-secret-song-player" class="music-player-container">
+        <div id="player-logo-wrapper-secret-song-player" class="player-logo-wrapper">
+          <div id="player-logo-background-secret-song-player" class="player-logo-background"></div>
+          <img src="https://i.ibb.co.com/9HGYdT1Z/aether2.png" alt="AetherX Logo" id="player-aetherx-logo-secret-song-player" class="player-aetherx-logo">
+        </div>
+        <div class="player-main player-main-secret-song-player">
+          <div class="track-info track-info-secret-song-player">
+            <span id="track-title-secret-song-player"></span><span id="track-artist-secret-song-player"></span>
+          </div>
+          <input type="range" id="seek-bar-secret-song-player" class="player-seek-bar" value="0" step="1" aria-label="Seek bar for Secret Song player">
+          <div class="time-display time-display-secret-song-player">
+            <span id="current-time-secret-song-player">0:00</span> / <span id="total-duration-secret-song-player">0:00</span>
+          </div>
+          <div class="player-controls player-controls-secret-song-player">
+            <button id="prev-button-secret-song-player" title="Previous" style="display:none;" aria-label="Previous Song (hidden)">«</button>
+            <button id="play-pause-button-secret-song-player" class="play-pause-btn" title="Play" aria-label="Play or Pause Secret Song player">►</button>
+            <button id="next-button-secret-song-player" title="Close Player" aria-label="Close Secret Song player">✕</button>
+          </div>
+        </div>
+        <audio id="audio-player-secret-song-player" preload="metadata"></audio>
+      </div>
+    </section>
+
+    <section id="next-page"> 
+      <div id="link-container">
+      </div>
+    </section>
+  </main>
+
+  <div id="youtube-video-overlay" aria-hidden="true">
+    <div id="youtube-player-container">
+    </div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM Element Cache ---
+        const Cache = {
+            body: document.body,
+            introSection: document.getElementById('intro'),
+            mainContent: document.querySelector('main'),
+            startStoryButton: document.getElementById('start-story'),
+            nextButtonMainPage: document.getElementById('next-button'),
+            scaryTextOverlay: document.getElementById('scary-text-overlay'),
+            fireBackground: document.getElementById('fire-background'),
+            calcDisplay: document.getElementById('calc-display'),
+            calcButtonsContainer: document.getElementById('calc-buttons'),
+            dateTimeLogo: document.getElementById('date-time-logo'),
+            countdownElement: document.getElementById('countdown'),
+            calculatorWidget: document.getElementById('calculator'),
+            dateTimeWidget: document.getElementById('date-time-logo'),
+            youtubeVideoOverlay: document.getElementById('youtube-video-overlay'),
+            youtubePlayerContainer: document.getElementById('youtube-player-container'),
+            darkModeToggleButton: document.getElementById('dark-mode-toggle'),
+            storyTextParagraph: document.getElementById('story-text-content'),
+            aetherxLogoInStory: document.querySelector('#story #aetherx-logo') // More specific selector
+        };
+
+        // --- State Variables ---
+        let State = {
+            youtubePlayer: null,
+            originalStoryTextHTML: Cache.storyTextParagraph ? Cache.storyTextParagraph.innerHTML : '',
+            currentPlayerIndex: 0,
+            activePlayerElements: {},
+            activePlayerConfig: {},
+            activePlayerType: 'main', // 'main' or 'secret'
+            currentCalcInput: '',
+            previousCalcInput: '',
+            calcOperator: null,
+            calcInputSequence: [],
+            calcInputSequence666: [],
+            calcMultiplyClicks: 0,
+            calcDivideClicks: 0,
+            dateTimeLogoClickCount: 0,
+            countdownTime: 9504000, // Seconds for approx. 110 days
+            isDarkMode: false,
+            nextButtonTimerId: null,
+        };
+        
+        // --- Constants & Configuration ---
+        const MORSE_MESSAGE_FOR_STORY = "LSAuIC0uLiAtLiAtLS0gLi0tLiAuLi4gLiAuLS4gLyAtLSAuLSAuLi0gLS0uLSAtLSAuLi0gLS4gLyAtLi4gLS0tIC4uLSAtLS4tIC8gLS0gLi4tIC4tLi4gLiAuLSAtLi0uIC8gLi4uIC4gLSAtLiAuLSAtIC0uLS4gLiAuLS0uIC4uLiAvIC0tLi4tLSAtLS0gLS4uIC0uIC4tIC0tIC4uIC4tLiAtLi0uIC4tIC4tLi4gLyAuLiAuLi4gLi4uIC4gLi4tLiAvIC4uLiAuLiAtLSAuLiAtLiAvIC4uIC4tLi4gLi4tIC0uLS4gLS0tIC8gLSAtLiAuLi0gLi4uIC8gLS0uLi0tIC0tLSAtLi4gLS4gLi0gLi4tIC0tLi0gLi4gLi0uLiAuLSAvIC4tLi0uLSAuIC4tIC4tLi4gLi0uLiAuIC0gLi4uIC8gLSAtLiAuLi0gLi4uIC8gLSAtLiAuIC0uLS4gLi4tIC4tLi4gLyAuIC4tIC4uLSAtLS4tIC8gLi0gLi4gLS4gLS0gLS0tIC8gLS4gLS0tIC0uIC8gLi0uLS4tIC0tLSAtLi4uIC4uIC4tLiAtLi0uIC4uLiAuIC4tLiAvIC4uLiAuLiAtLSAuLiAuLS4gLS4tLiAuLSAuLS4uIC8gLS4tLiAtLiAuLi0gLS4gLyAtLS4uLS0gLi4gLi4uLSAuIC4tLi4gLi0tLiAtLSAuLiAvIC0tLSAuLiAtLi4gLS0tIC8gLS0gLi4tIC0uLS4gLyAtLSAuLiAuLS4uIC0tLSAvIC4uLiAuLSAuLi0gLS0uLSAvIC4uLiAuIC0uLS4gLiAuLS4gLi0tLiAvIC0tLi4tLSAtIC4tIC4uIC0uLS4gLi4uIC8gLi0gLi0uLiAuLS4uIC4uIC8gLSAuLi0gLyAtLS0uLi4gLS0tIC4uIC4tLS4gLi4tIC0uLS4gLyAtLSAuIC4tLiAvIC0tIC4tIC0uIC4uLSAvIC0tLi4tLSAtLS0gLiAuLi4gLS4gLi0gLi0uIC0gLyAtLSAuLiAtIC4tIC0uLiAuLSAuLS4gLS0uIC8gLS4uIC0tLSAuLi0gLS0uLSAvIC4gLi0uIC0tLSAuLS0uIC0tIC4gLSAvIC0tLSAuLi0gLS0uLSAuLiAuLS4uIC4gLi0uIC8gLS4gLi4gLyAtIC4gLyAuLiAuLi0gLi4tLiAvIC4uLiAuLi0gLSAtLi0uIC4tIC4tLiAuLi0uIC8gLiAtLi4gLi0uLiAuLSAuLi4tIC8gLi0gLi4gLi4tIC0tLi0gLyAtLi4gLiAuLi4gLi4gLi4tIC4uLS4gLyAuLi4gLi4tIC4tLi4gLi0gLS0gLyAuLSAuLiAuLi0gLS0uLSAvIC0uIC0tLSAtLiAvIC0tLi4tLSAtLS0gLSAtLiAuIC0tIC4gLS0gLyAtLS4uLS0gLi4uIC4uIC4tLiAuIC4uIC0uLiAuLi0gLi0gLyAtLSAuLi0gLiAtLSAvIC0uIC4gLS0gLS0tIC0uIC8gLS0tIC0uLiAtLiAuLSAuLi0gLS0uLSAuLiAuLS4uIC4tIC8gLi4gLi4uIC8gLS4uIC4gLi4uIC8gLS0uLi0tIC0gLi4gLS4uLiAuLSAtLi4gLyAtLiAtLS0gLS4gLyAtLSAuIC0uIC0tLSAuLiAuLi4gLi0gLS4tLiAtLi0uIC0tLSAvIC0tIC4tIC0uLiAtLiAuLi0gLS4tLiAuIC4uLiAvIC4uIC4uLi4gLi4gLS0gLyAuLSAtIC4uIC4uLi0gLyAuIC4uLiAuLi4gLi0gLSAuLS4gLS0tIC4uLS4gLyAtIC4uIC0uLS4gLiAuLi0uIC4gLS4uIC8gLS4uIC4gLi4uIC8gLS0uLi0tIC4gLSAtLi0uIC4gLi0uIC8gLSAuLiAuLi0gLi0uLiAtLS0gLi4uLSAvIC4gLi0uIC4tIC0tIC4tIC8gLS0tIC0uLiAtLiAuLSAuLi0gLS0uLSAuLiAuLS4uIC4tIC8gLi4gLi4tIC0tLi0gLyAuLi4gLi4gLyAtIC4uLSAvIC0tLSAuLS4uIC0tLSAuLi4tIC8gLi4gLi0uIC4tIC4tLiAtLS0gLS0gLiAtLSAvIC0tIC4uLSAtIC0uIC4tIC0gLyAuLS4tLi0gLS0tIC4tLi4gLS0tIC0uIC8gLi4gLSAtIC4uIC0tIC4gLi0uIC8gLiAuLi4gLi4uIC4uIC0uLiAtLS0gLi4tLiAvIC4uLiAuLi0gLi4gLiAvIC0tIC4uLSAuLS4gLS4tLiAuLS4uIC4uLSAuLS0uIC4gLi4uIC8gLS0gLi4tIC4uLiAuLS0uIC4uIC8gLiAtLSAvIC0gLiAvIC4tLi0uLSAuLS4tLi0gLi0uLS4tIC4gLi4uIC4uLiAuLiAuLi0gLi4tLiAvIC0tIC4uLSAtIC4tIC0tIC4tIC8gLS0tIC0uLiAtLiAuLSAuLi0gLS0uLSAuLiAuLS4uIC4tIC8gLiAtLSAvIC0tIC4uIC4tLiAuIC0uIC4uIC0tIC4gLS0gLyAtIC4uLSAvIC0tLi4tLSAtIC4gLi4uIC4uLiAuLiAuLi0gLS0uLSAuLiAuLS4uIC4gLi0uIC8gLS0tIC4gLS0gLyAuIC4tLiAtLS0gLi0tLiAtLS0gLi4uIC8gLS4gLi4gLyAuLi4gLi4tIC4uIC4gLyAuLi4gLi4tIC0gLi0uLiAuLi0gLi4uLSAvIC4tIC0gLS4gLiAtLSAtLS4gLi0gLi0uIC4uLS4gLyAuIC4uLiAuLS0uIC4uIC8gLi4uIC4uLSAuIC0uLiAvIC4uIC4uLiAuLSAuLi0gLS0uLSAvIC0tLi4tLSAuLiAuLi4tIC4uIC4uLiAuIC4tIC4uLSAtLS4tIC8gLi4uIC4uIC4uIC0uIC0tIC0tLSAuLi4gLyAtLiAuLiAvIC4uLiAuLi0gLi4gLiAvIC0tIC4tIC4tLiAtLi4uIC0tIC4uLSAvIC0tLi4tLSAtLS0gLi4gLSAtLiAuIC4tLi4gLi4gLi4uIC8gLS4gLi4gLyAtLSAuLi0gLi4uIC8gLi4uIC4uLSAtIC4tIC0uIC0tLSAtLi0uIC8gLiAuLS4gLi0gLS0gLi0gLi0uLiAtLi0uIC8gLS0gLi4tIC4uLiAuLi4gLS0tIC4tLS4gLyAtLiAtLS0gLS4gLyAuLiAtIC0uLS4gLiAuLS4uIC4tLS4gLS0gLi0gLyAuLi4gLi0gLi4tIC0tLi0gLyAtIC4tIC4uLi0gLi0uIC4gLi4uIC8gLi4uIC4tIC0tIC4uIC4tLiAtLi0uIC4tIC4tLi4gLyAuLiAuLi0gLS0uLSAvIC4uLiAuIC4uIC0uLiAvIC4tLi0uLSAuLS0gLi4gLS4uIC0tLSAvIC0tIC4gLi4tIC0tLi0gLyAuLi4gLiAuLiAtLi4gLyAtIC4uLiAuIC8gLS4tLiAtLiAuLi0gLS4gLyAtLS4uLS0gLSAuLSAtLi4uIC4tIC0gLi4uIC4uIC0uLiAvIC4gLS0gLyAuLSAvIC4gLi4gLS4uIC8gLS0tIC0uIC4uLSAvIC4tIC4uIC4uLSAtLS4tIC8gLS0uLi0tIC0tIC4tIC0uLi4gLi0gLi0uLiAuLS4uIC4gLi0tLiAuLS0uIC4tIC8gLi0uLi0uIC0tIC4gLi0uIC4tIC4tLi4gLi4tIC0tLiAtLiAuLiAuLi4gLi0uLi0uIC8gLi0uIC4gLi0tLiAtLSAuIC4uLiAvIC0tIC4gLi4tIC0tLi0gLyAtLS4uLS0gLi4uIC4uLSAuLiAuIC8gLi4uIC4uIC4tLi4gLi0gLSAuLSAtLiAvIC4uLiAuIC4uIC0uLiAvIC4tLi0uLSAuLiAtLi4tIC4uLSAuLS4gLSAuLi4gLiAtLi4gLyAtLSAuLi0gLiAvIC0tIC4tIC4uLSAtLS4tIC0gLi4uIC0tLSAuLS0uIC8gLi4uIC4uIC4uLi0gLi0gLi0uIC0tLiAvIC4uLiAuLiAtLSAuLiAtLiAvIC0gLi4uIC4gLyAuLi4gLi4tIC0gLS4tLiAuLSAuLi0uIC8gLi4uIC4uLSAtLi4gLS4gLi4tIC0tIC8gLS4uIC0tLSAuLi0gLS0uLSAvIC0uLiAuIC4uLiAvIC0tLi4tLSAuIC4tLiAtLS0gLi0tLiAtLSAuIC0gLyAtLiAtLS0gLS4gLSAuLiAuLiAtLi4uIC4tIC8gLi0gLi0uLiAuLS4uIC4uIC8gLi4gLi4uLSAuLSAuIC4tLiAtLi0uIC8gLiAuLi4gLi0tLiAuLiAvIC4uLiAuLSAuLi0gLS0uLSAvIC0gLi4gLS4uIC4uIC0uLS4gLiAtLi0uIC8gLi4uIC4tIC4tLiAtLi4uIC4gLS4gLiAtIC8gLS4gLi4gLyAuIC0tIC8gLS0gLi4tIC0uLS4gLyAuLSAtLiAuLi0gLyAtLS4uLS0gLSAuLiAuLi0gLi4tLiAvIC4tIC0tIC4uIC4uLiAuLi4gLi4gLi0uIC4gLS4tLiAtLiAuLiAuLi4gLyAuIC4tIC4uLSAtLS4tIC8gLS0uLi0tIC4tIC4tLi4gLi0uLiAuLiAvIC0uLS4gLiAtLiAtLS0gLS4uIC8gLS0uLi0tIC4gLi0uIC4tIC4uLSAtLS4tIC4gLi0gLyAuLSAuLiAtLiAtLSAtLS0gLyAtLSAuIC0uIC0tLSAuLiAtIC4tLi4gLi4tIC8gLi4gLi4uLSAuLSAtIC4uLSAuLS0uIC8gLi0uLS4tIC0gLS4gLi4tIC4uLiAvIC4gLi0gLS4uLSAuIC4tLi4gLi0tLiAtLSAuLSAvIC0tIC4uLSAuLiAtLi4gLS0tIC8gLiAuLSAuIC0tIC8gLi4uIC4uLSAtLiAuLSAtLSAvIC0uLiAuIC4uLiAvIC0tLi4tLSAuLiAuLi0gLi0uLiAtLS0gLi4uLSAvIC4gLi4uIC4uLiAuIC8gLi4uIC0tLSAuLS4gLiAuLi4uIC8gLi0uLS4tIC4gLi0gLiAtLSAvIC4uLiAuIC0uLS4gLiAuLS4gLi0tLiAvIC0tIC4tIC4uLSAtLS4tIC8gLSAuLSAuLS4gLiAvIC4tLiAtLS0gLi4gLi0uIC4gLi0uLiAuIC0uLS4gLyAuLSAuIC0tIC8gLi0gLi4gLSAuLiAtIC4tLi4gLi4tIC0gLi4uIC8gLS4uIC4gLi4uIC8gLi0uIC4gLi0tLiAuLi4gLi4gLi0uLiAuLi0gLi0gLi0tLiAvIC4uIC4uLiAvIC0tIC4tIC4uIC0gLiAvIC0tLi4tLSAuIC4tLiAuIC0uLiAuLiAuLS4gLiAtLi4gLyAuIC0tIC8gLiAuLS4gLi0gLi4uIC4uLiAuIC0uLS4gLyAuLiAuLi4gLi0gLi4tIC0tLi0gLyAtLSAuLi0gLS4uIC0uIC4uLSAtLSAvIC0gLi4gLS4tLiAuIC4uLS4gLyAtLi4tIC0tLSAuLi4tIC8gLi4uIC4uLSAuLiAuLi0gLS4tLiAvIC0tLi4tLSAtLS0gLSAuLi4gLiAuLi0uIC8gLiAuLiAtLi4gLyAuLi4gLi4tIC0uIC4uIC0gLi4tIC0gLi0gLS0gLyAuLS4uIC0tLSAuLi4gLyAtLSAuLSAuLi0gLS0uLSAvIC0gLi0gLi0uIC4gLyAuLi4gLi4tIC4uIC0uLiAuLiAuLS4uIC4tIC0uLS4gLyAuLS4gLS0tIC0uLS4gLyAuLi4gLi4tIC4uIC4uLSAtLi0uIC8gLS0uLi0tIC4uIC4uLi0gLi0gLS0gLi0gLyAtLSAuIC4uLSAtLS4tIC4uIC4tLi4gLi0gLyAtLS0uLi4gLS0tIC4uIC0uLS4gLi4uIC8gLS0gLi4tIC0uIC4uLSAvIC4uIC0gLi0gLS4gLi0gLi4uIC8gLS0gLi0gLi4tIC0tLi0gLS0gLi4tIC0uIC8gLi4uIC4uIC4tLiAuIC0uIC4tLi4gLi4tIC4uLi0gLyAuIC4tIC4uIC4uLSAtLS4tIC4uIC4tLi4gLiAuLS4gLyAtLSAuLi0gLSAtLiAuLSAtIC8gLS4gLi0gLyAtLS4uLS0gLSAuLiAuLi4gLyAuLSAuLiAtIC0uIC4gLSAuLiAtLiAuIC4tIC4tLS4gLyAuIC4tLiAuIC4uLi0gLyAtLi0uIC0tLSAuLi4uIC8gLS0gLi4tIC4tLiAtIC4uLSAvIC0tLSAuLiAtLi0uIC4uLiAuIC0u";
+        const SECRET_SONG_PLAYER_ID_PREFIX = 'secret-song-player';
+        const YOUTUBE_VIDEO_ID_666 = 'CcnzvIM5XX0';
+
+        const PLAYERS_DATA = [ 
+            { idPrefix: 'fuchsia',  track: { title: "Oblivium", artist: "nLebron James", src: "phase38.mp3" }, 
+              theme: { color: 'fuchsia', glow: 'fuchsia', mainTextColor: 'white', playerBoxBg: 'transparent', playerBoxText: 'white', seekBarThumb: 'white', logoSpin: 'spin-fuchsia'} },
+            { idPrefix: 'emerald',  track: { title: "Exsilum Innocentiae", artist: "antisigma", src: "phase42.mp3" }, 
+              theme: { color: '#2ecc71', glow: '#2ecc71', mainTextColor: 'white', playerBoxBg: 'white', playerBoxText: '#333', seekBarThumb: '#2ecc71', logoSpin: 'spin-emerald'} },
+            { idPrefix: 'burgundy', track: { title: "Tenebris Speravi", artist: "zen", src: "phase43.mp3" }, 
+              theme: { color: '#800020', glow: '#800020', mainTextColor: 'white', playerBoxBg: 'rgba(255,255,255,0.9)', playerBoxText: '#4c0013', seekBarThumb: '#800020', logoSpin: 'spin-burgundy'} },
+            { idPrefix: 'ivory',    track: { title: "Lacrimae Obscurae", artist: "wiwok", src: "phasegiygas.mp3" }, 
+              theme: { color: '#FFFFF0', glow: '#E0E0D0', mainTextColor: '#4A4A4A', playerBoxBg: '#F8F8F0', playerBoxText: '#505050', seekBarThumb: '#808078', logoSpin: 'spin-ivory'} }
+        ];
+        
+        const NUMBER_TEXT_MAP = { 
+            "12824": ".novem ,90x239 ,duo :memoriae fragmenta sunt numeri singuli ,mihi sed ,est numerus tantum fortasse mundo quod SMP”€âstat urbis corde in quae schola Ex", 
+            "24812": ".magrep tu tse asuac aiuq des ,tse atciler aiuq non”€âtessiusop em tsop mae mutaf isauq ,tse atan oge mauq meid munu tsoP", 
+            "82412": ".earbmu des ,sumus setsoh noN .subla te regiN .ilibarim ainomrah ni nemat ,atisoppo etrap ni snats”€âogile murgin repmes iuq”€âmetua ogE .taetal onnap bus diuq erediv rutnanoc irecnis mulos aiuq des ,tluv eretal aiuq non ,rutiget abla repmes suie seicaF", 
+            "12248": ".erenam mucem essop ainmo non merecsid tu tua ,tabeipuc menidutilos aiuq essatroF .tisualc oirotaro ni em ,subitnelis subissap ,milO", 
+            "24128": ".eravres matelpmocni nisohpromatem mae ididerc ,eid olli xe te”€âidiv lemes des ,tnuics senmo noN .tse sinoilipap muigitsev ,suie artsinis amlap nI", 
+            "15": ".titnes cis es aspi aiuq essatrof”€ârutnuuqniler mudretni odnum a iuq”€âtigile sollI .titnes eneb es mucric silupicsid muc es repmes des ,melamrof maitneuqerf tama noN", 
+            "888": ".ecov enis medif te sutca mutnat des ,tiderc non abrev ouq mudom ,suie muitnelis rep ixelletni des ,tebah eliciffid mediF", 
+            "1212": ".lumis murhclup te snelod :sirolf sila muc mulet isauq ,tavres eclud mumsacras ,ae bus”€âevac deS .alliuqnart arepsev ni siunet aivulp tucis ,tse sillom suie xoV", 
+            "2424": ".tidnetnoc esse sudigirf sudnum muc ,eritnes tedua aiuq :suie odutitrof tse coh ,ihim des ,tnacov metatimrifni coh itluM .titnes elicaf ,rutignat elicaF", 
+            "119": ".tse aucav ohce mutnat susir ,ae enis aiuq :oednopser ,ted muvon musir sudnum sivmauq ,mis cih cuhda ruc sireauq iS .onimon malli ,oredised emixam meuq sireauq iS .onimon malli ,oma emixam meuq tis siuq sireauq is ...tE", 
+            "269": ".tnus selibarepusni erev eamina madeauq aiuq des ...mus sumrifni aiuq non ,icsivilbo mussop noN", 
+            "16": ".malli :menoitalpmetnoc manu retporp rabeuqes malc eauq avrap aigitsev des ,tnare sessalc mulos non essatroF .tiisnart G7 da otibus ednied ;C6 ,C5 ,C4 ,C3 ,C2 :tabedes ilibairavni arettil te subirapmi subissalc ni eauq alupicsiD"
+        };
+        
+        let SECRET_SONG_TRIGGERS = {
+            clearCalc: { count: 0, threshold: 24, song: { title: "ForF", artist: "YourForgottenGift", src: "happier.mp3", theme: {color: "#4A90E2", glow: "#81C784", playerBoxBg: "white", playerBoxText: "#333", seekBarThumb: "#4A90E2", mainTextColor: "white", logoSpin: "spin-secret-song-player"}}}, 
+            dotCalc:   { count: 0, threshold: 24, song: { title: "Melukis Senja", artist: "Budi Doremi", src: "senja.mp3", theme: {color: "orange", glow: "darkorange", playerBoxBg: "white", playerBoxText: "#333", seekBarThumb: "orangered", mainTextColor: "white", logoSpin: "spin-secret-song-player"}}}, 
+            dateTime:  { count: 0, threshold: 24, song: { title: "Ghost", artist: "Justin Bieber", src: "ghost.mp3", theme: {color: "grey", glow: "darkgrey", playerBoxBg: "#f0f0f0", playerBoxText: "#333", seekBarThumb: "dimgrey", mainTextColor: "#333", logoSpin: "spin-secret-song-player"}}}, 
+            playerLogo:{ count: 0, threshold: 24, song: { title: "Golden Hour", artist: "JVKE", src: "goldenhour.mp3", theme: {color: "gold", glow: "yellow", playerBoxBg: "white", playerBoxText: "#333", seekBarThumb: "darkgoldenrod", mainTextColor: "#333", logoSpin: "spin-secret-song-player"}}}, 
+            playerNext:{ count: 0, threshold: 24, song: { title: "Jangan Kau Lepas", artist: "Alexa", src: "mutia.mp3", theme: {color: "lightpink", glow: "deeppink", playerBoxBg: "white", playerBoxText: "#333", seekBarThumb: "hotpink", mainTextColor: "#333", logoSpin: "spin-secret-song-player"}}}, 
+            playerPrev:{ count: 0, threshold: 24, song: { title: "Dear God", artist: "Avenged Sevenfold", src: "deargod.mp3", theme: {color: "#607D8B", glow: "#455A64", playerBoxBg: "white", playerBoxText: "#333", seekBarThumb: "#37474F", mainTextColor: "white", logoSpin: "spin-secret-song-player"}}}
+        };
+        
+        // --- Utility Functions ---
+        const Utils = {
+            formatTime: (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = Math.floor(seconds % 60);
+                return `${m}:${s < 10 ? '0' : ''}${s}`;
+            },
+            debounce: (func, delay) => {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), delay);
+                };
+            },
+            isValidColor: (strColor) => {
+                if (typeof chroma !== 'function') return false;
+                try {
+                    chroma(strColor);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+            getContrastingTextColor: (bgColor) => {
+                if (typeof chroma !== 'function' || !Utils.isValidColor(bgColor)) return 'white'; 
+                return chroma.contrast(bgColor, 'white') > chroma.contrast(bgColor, 'black') ? 'white' : 'black';
+            }
+        };
+
+        // --- UI Management ---
+        const UIManager = {
+            toggleDarkMode: () => {
+                State.isDarkMode = Cache.body.classList.toggle('dark-mode');
+                UIManager.applyCurrentDarkModeStyles();
+                try {
+                    localStorage.setItem('darkMode', State.isDarkMode ? 'enabled' : 'disabled');
+                } catch (e) { console.warn("Could not save dark mode preference to localStorage:", e); }
+            },
+            applyCurrentDarkModeStyles: () => {
+                State.isDarkMode = Cache.body.classList.contains('dark-mode'); 
+                if (Cache.storyTextParagraph && State.originalStoryTextHTML) {
+                    if (Cache.mainContent && getComputedStyle(Cache.mainContent).display !== 'none') {
+                        Cache.storyTextParagraph.innerHTML = State.isDarkMode ? MORSE_MESSAGE_FOR_STORY : State.originalStoryTextHTML;
+                         Cache.storyTextParagraph.style.color = State.isDarkMode ? 
+                            getComputedStyle(Cache.body).getPropertyValue('--story-text-color-dark') :
+                            getComputedStyle(Cache.body).getPropertyValue('--story-text-color-light');
+                    }
+                }
+
+                if (Cache.nextButtonMainPage && Cache.nextButtonMainPage.disabled && Cache.nextButtonMainPage.textContent.startsWith("Tunggu")) {
+                    Cache.nextButtonMainPage.style.backgroundColor = "#cccccc"; 
+                    Cache.nextButtonMainPage.style.color = "#666666";
+                } else if (Cache.nextButtonMainPage) {
+                    Cache.nextButtonMainPage.style.backgroundColor = State.isDarkMode ? 
+                        getComputedStyle(Cache.body).getPropertyValue('--button-bg-dark') : 
+                        getComputedStyle(Cache.body).getPropertyValue('--button-bg-light');
+                    Cache.nextButtonMainPage.style.color = State.isDarkMode ? 
+                        getComputedStyle(Cache.body).getPropertyValue('--button-text-dark') : 
+                        getComputedStyle(Cache.body).getPropertyValue('--button-text-light');
+                }
+
+                if (State.activePlayerElements.container && State.activePlayerConfig.theme) {
+                    PlayerManager.applyThemeStyles(State.activePlayerElements, State.activePlayerConfig.theme);
+                }
+            },
+            setWidgetVisibility: (visible) => {
+                const displayStyle = visible ? 'block' : 'none'; 
+                if (Cache.calculatorWidget) Cache.calculatorWidget.style.display = displayStyle;
+                if (Cache.dateTimeWidget) Cache.dateTimeWidget.style.display = displayStyle;
+            },
+            showScaryOverlayText: () => {
+                if (Cache.scaryTextOverlay) {
+                    Cache.scaryTextOverlay.style.display = 'block';
+                     Cache.scaryTextOverlay.addEventListener('animationend', () => {
+                        Cache.scaryTextOverlay.style.display = 'none';
+                    }, { once: true });
+                }
+            },
+            createFireNumber: () => {
+                if (!Cache.fireBackground) return;
+                const d = document.createElement('div');
+                d.className = 'fire-number';
+                d.textContent = Math.floor(Math.random() * 17) + 8; 
+                d.style.left = `${Math.random() * 100}vw`;
+                d.style.animationDuration = `${Math.random() * 2 + 2}s`; 
+                Cache.fireBackground.appendChild(d);
+                setTimeout(() => {
+                    if (Cache.fireBackground.contains(d)) Cache.fireBackground.removeChild(d);
+                }, parseFloat(d.style.animationDuration) * 1000 + 500);
+            },
+            startButtonTimer: (buttonElement, durationSeconds) => {
+                if (!buttonElement) return;
+                if (State.nextButtonTimerId) clearInterval(State.nextButtonTimerId); 
+
+                buttonElement.disabled = true;
+                let countdown = durationSeconds;
+
+                const updateButtonText = () => {
+                    const minutes = Math.floor(countdown / 60);
+                    const seconds = countdown % 60;
+                    buttonElement.textContent = `Tunggu ${minutes} menit ${seconds} detik...`;
+                    buttonElement.style.backgroundColor = "#cccccc"; 
+                    buttonElement.style.color = "#666666";
+                };
+
+                updateButtonText(); 
+
+                State.nextButtonTimerId = setInterval(() => {
+                    countdown--;
+                    if (countdown <= 0) {
+                        clearInterval(State.nextButtonTimerId);
+                        State.nextButtonTimerId = null;
+                        buttonElement.disabled = false;
+                        buttonElement.textContent = "Lanjutkan";
+                        UIManager.applyCurrentDarkModeStyles(); 
+                    } else {
+                        updateButtonText();
+                    }
+                }, 1000);
+            },
+            updateMainCountdown: () => {
+                if (!Cache.countdownElement) return;
+                if (State.countdownTime > 0) State.countdownTime--;
+
+                let hours = Math.floor(State.countdownTime / 3600);
+                let minutes = Math.floor((State.countdownTime % 3600) / 60);
+                let seconds = State.countdownTime % 60;
+
+                if (State.countdownTime <= 0) {
+                    Cache.countdownElement.textContent = "The time has come.";
+                } else {
+                    let parts = [];
+                    if (hours > 0) parts.push(`${hours.toLocaleString()} hour${hours > 1 ? 's' : ''}`);
+                    if (minutes > 0) parts.push(`${minutes.toLocaleString()} minute${minutes > 1 ? 's' : ''}`);
+                    if (seconds > 0 || (hours === 0 && minutes === 0)) parts.push(`${seconds} second${seconds > 1 ? 's' : ''}`);
+                    Cache.countdownElement.textContent = `${parts.join(', ')} before her death`;
+                }
+            },
+            displayTemporaryText: (text) => { 
+                const existingOverlay = document.getElementById('temp-text-overlay');
+                if (existingOverlay) existingOverlay.remove();
+
+                const el = document.createElement("div");
+                el.id = 'temp-text-overlay';
+                Object.assign(el.style, {
+                    position:"fixed", top:"50%", left:"50%", transform:"translate(-50%, -50%)",
+                    fontFamily:"'Courier New', monospace", fontSize:"20px", color:"red",
+                    textAlign:"center", zIndex:"99999", padding:"20px",
+                    backgroundColor:"black", border:"2px solid red",
+                    boxShadow:"0 0 10px red", borderRadius:"10px",
+                    maxWidth:"80%", overflowWrap:"break-word",
+                    maxHeight: "70vh", overflowY: "auto"
+                });
+                el.textContent = text;
+                Cache.body.appendChild(el);
+                setTimeout(() => {
+                    if (Cache.body.contains(el)) Cache.body.removeChild(el);
+                }, 5000); 
+            }
+        };
+
+        // --- Effects & Special Triggers ---
+        const Effects = {
+            preventScreenshotAndRecording: () => {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'PrintScreen') {
+                        e.preventDefault();
+                        UIManager.displayTemporaryText('Apasih kids sono belajar bahasa lain wibu');
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText('')
+                                .catch(err => console.warn('Could not clear clipboard:', err));
+                        }
+                    }
+                });
+            },
+            triggerScaryEffectDateTime: () => {
+                const originalBodyStyle = { 
+                    background: Cache.body.style.background,
+                    backgroundImage: Cache.body.style.backgroundImage,
+                    backgroundColor: Cache.body.style.backgroundColor,
+                    color: Cache.body.style.color
+                };
+                
+                const scaryTextElement = document.createElement('div');
+                scaryTextElement.id = 'temp-scary-overlay';
+                scaryTextElement.textContent = "Ultimus secundus transiit, et iam mortuus est. Cur adhuc caecos vos geritis adversus crudelitatem mundi digitalis? Ille e stirpe clarissima ortus est, patriae beneficio natus. Sed oppressus tempestatibus cyberneticis, animo fracto, in tenebras descendit. Morbus mentis eum devoravit. Et vos... adhuc dormitis? O vos stulti, vos creduli: in caede partem habuistis. Peccatum in animis vestris manebit, donec verba vestra venenata evanescant—aut vos ipsos damnatio excutiat.";
+                Object.assign(scaryTextElement.style, {
+                    position:"fixed", top:"50%", left:"50%", transform:"translate(-50%, -50%)",
+                    fontFamily:"'Courier New', monospace", fontSize:"20px", textAlign:"center",
+                    zIndex:"100000", color:"red", maxWidth:"90%", overflowWrap:"break-word",
+                    backgroundColor:"rgba(0,0,0,0.85)", padding:"20px", borderRadius:"10px",
+                    border: "2px solid red", boxShadow: "0 0 20px red"
+                });
+
+                const skullImage = document.createElement('img');
+                skullImage.id = 'temp-scary-skull';
+                skullImage.src = "https://i.ibb.co.com/2Yns3fLz/no-Filter-remove-bg-io.png"; 
+                Object.assign(skullImage.style, {
+                    position:"fixed", top:"50%", left:"50%", transform:"translate(-50%, calc(-50% - 100px))", 
+                    width:"120px", height:"120px", zIndex:"99999", display:"none", filter: "drop-shadow(0 0 10px red)"
+                });
+
+                Cache.body.appendChild(scaryTextElement);
+                Cache.body.appendChild(skullImage);
+
+                let isBlack = true;
+                const glitchInterval = setInterval(() => {
+                    Cache.body.style.backgroundColor = isBlack ? "black" : "red";
+                    Cache.body.style.backgroundImage = "none";
+                    Cache.body.style.color = isBlack ? "red" : "black";
+                    scaryTextElement.style.color = isBlack ? "red" : "black";
+                    scaryTextElement.style.backgroundColor = isBlack ? "rgba(0,0,0,0.85)" : "rgba(50,0,0,0.85)";
+                    skullImage.style.display = isBlack ? "block" : "none";
+                    isBlack = !isBlack;
+                }, 100);
+
+                setTimeout(() => {
+                    clearInterval(glitchInterval);
+                    Cache.body.style.background = originalBodyStyle.background;
+                    Cache.body.style.backgroundImage = originalBodyStyle.backgroundImage;
+                    Cache.body.style.backgroundColor = originalBodyStyle.backgroundColor;
+                    Cache.body.style.color = originalBodyStyle.color;
+                    
+                    if (!State.isDarkMode && !originalBodyStyle.backgroundColor && !originalBodyStyle.backgroundImage) {
+                         Cache.body.style.backgroundImage = getComputedStyle(document.documentElement).getPropertyValue('--bg-gradient-light');
+                    } else if (State.isDarkMode) {
+                        Cache.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-color-dark');
+                    }
+
+
+                    if (Cache.body.contains(scaryTextElement)) Cache.body.removeChild(scaryTextElement);
+                    if (Cache.body.contains(skullImage)) Cache.body.removeChild(skullImage);
+                    
+                    UIManager.applyCurrentDarkModeStyles(); 
+                    State.dateTimeLogoClickCount = 0; 
+                }, 4000);
+            }
+        };
+
+        // --- Calculator Logic ---
+        const Calculator = {
+            updateDisplay: (value) => {
+                if (Cache.calcDisplay) Cache.calcDisplay.textContent = value || '0';
+            },
+            calculate: (a, b, op) => {
+                a = parseFloat(a); b = parseFloat(b);
+                if (isNaN(a) || isNaN(b)) return 'Error';
+                switch (op) {
+                    case '+': return a + b;
+                    case '-': return a - b;
+                    case '*': return a * b;
+                    case '/': return b !== 0 ? a / b : 'Error';
+                    default: return b;
+                }
+            },
+            handleInput: (value) => {
+                if (!isNaN(parseInt(value)) && value !== '.') {
+                    State.calcInputSequence666.push(value);
+                    if (State.calcInputSequence666.join('') === '666') {
+                        YouTubePlayer.showVideo();
+                        State.calcInputSequence666 = [];
+                    } else if (State.calcInputSequence666.length >= 3) {
+                        State.calcInputSequence666.shift();
+                    }
+                } else {
+                    State.calcInputSequence666 = []; 
+                }
+
+                if (!isNaN(parseFloat(value)) || value === '.') { 
+                    if (State.currentCalcInput.includes('.') && value === '.') return; 
+                    State.currentCalcInput += value;
+                    Calculator.updateDisplay(State.currentCalcInput);
+                    
+                    State.calcInputSequence.push(value);
+                    const sequenceStr = State.calcInputSequence.join('');
+                    if (NUMBER_TEXT_MAP[sequenceStr]) {
+                        UIManager.displayTemporaryText(NUMBER_TEXT_MAP[sequenceStr]);
+                        State.calcInputSequence = [];
+                    }
+                    const links = {
+                        "3264": "https://ibb.co.com/PsStWqdP", 
+                        "6529": "https://ibb.co.com/HT4pzqh2",
+                        "81224": "https://ibb.co.com/SXZw0qFS",
+                        "21610": "https://youtu.be/ACQNclEiq00",
+                        "21510": "https://www.mediafire.com/file/nt4z3eob4d91spz/fallen_white_knight_unfinished_ver_4.docx/file"
+                    };
+                    if (links[sequenceStr]) {
+                        window.open(links[sequenceStr], '_blank'); 
+                        State.calcInputSequence = [];
+                    }
+                    if (State.calcInputSequence.length > 10) State.calcInputSequence.shift();
+
+                } else if (['+', '-', '*', '/'].includes(value)) { 
+                    if (State.currentCalcInput === '' && State.previousCalcInput === '') return;
+                    if (State.currentCalcInput !== '') {
+                        if (State.previousCalcInput !== '' && State.calcOperator) {
+                            const result = Calculator.calculate(State.previousCalcInput, State.currentCalcInput, State.calcOperator);
+                            Calculator.updateDisplay(result);
+                            State.previousCalcInput = result.toString();
+                        } else {
+                            State.previousCalcInput = State.currentCalcInput;
+                        }
+                    }
+                    State.calcOperator = value;
+                    State.currentCalcInput = '';
+                    State.calcInputSequence = []; 
+                } else if (value === '=') { 
+                    if (State.currentCalcInput === '' || State.previousCalcInput === '' || !State.calcOperator) return;
+                    const result = Calculator.calculate(State.previousCalcInput, State.currentCalcInput, State.calcOperator);
+                    Calculator.updateDisplay(result);
+                    State.currentCalcInput = result.toString(); 
+                    State.previousCalcInput = '';
+                    State.calcOperator = null;
+                    State.calcInputSequence = [];
+                    State.calcInputSequence666 = []; 
+                } else if (value === 'C') { 
+                    State.currentCalcInput = ''; State.previousCalcInput = ''; State.calcOperator = null;
+                    Calculator.updateDisplay('0');
+                    State.calcInputSequence = [];
+                    State.calcInputSequence666 = [];
+                }
+            }
+        };
+
+        // --- Music Player Management ---
+        const PlayerManager = {
+            getPlayerElements: (idPrefix) => {
+                const container = document.getElementById(`music-player-container-${idPrefix}`);
+                if (!container) return {}; 
+                return {
+                    container,
+                    audio: document.getElementById(`audio-player-${idPrefix}`),
+                    playPauseBtn: document.getElementById(`play-pause-button-${idPrefix}`),
+                    nextBtn: document.getElementById(`next-button-${idPrefix}`), 
+                    prevBtn: document.getElementById(`prev-button-${idPrefix}`),
+                    seekBar: document.getElementById(`seek-bar-${idPrefix}`),
+                    titleEl: document.getElementById(`track-title-${idPrefix}`),
+                    artistEl: document.getElementById(`track-artist-${idPrefix}`),
+                    currentTimeEl: document.getElementById(`current-time-${idPrefix}`),
+                    totalDurationEl: document.getElementById(`total-duration-${idPrefix}`),
+                    logoBg: document.getElementById(`player-logo-background-${idPrefix}`),
+                    logoImg: document.getElementById(`player-aetherx-logo-${idPrefix}`)
+                };
+            },
+            applyThemeStyles: (elements, themeConfig) => {
+                if (!elements.container || !themeConfig) return;
+                const style = elements.container.style;
+                const isDark = Cache.body.classList.contains('dark-mode');
+                
+                style.setProperty('--player-bg-color', themeConfig.color || (isDark ? '#333' : '#777'));
+                style.setProperty('--player-glow-color', themeConfig.glow || themeConfig.color || (isDark ? '#555' : 'transparent'));
+                style.setProperty('--player-text-color', themeConfig.mainTextColor || (isDark ? '#e0e0e0' : 'white'));
+                style.setProperty('--player-main-box-bg', themeConfig.playerBoxBg || (isDark ? getComputedStyle(document.documentElement).getPropertyValue('--player-main-box-bg-dark') : 'transparent'));
+                style.setProperty('--player-main-box-text-color', themeConfig.playerBoxText || (isDark ? getComputedStyle(document.documentElement).getPropertyValue('--player-main-box-text-color-dark') : style.getPropertyValue('--player-text-color')));
+                style.setProperty('--player-track-title-color', themeConfig.playerBoxText || (isDark ? getComputedStyle(document.documentElement).getPropertyValue('--player-track-title-color-dark') : style.getPropertyValue('--player-text-color')));
+                style.setProperty('--player-track-artist-color', themeConfig.playerBoxText || (isDark ? getComputedStyle(document.documentElement).getPropertyValue('--player-track-artist-color-dark') : style.getPropertyValue('--player-text-color')));
+                style.setProperty('--player-time-display-color', themeConfig.playerBoxText || (isDark ? getComputedStyle(document.documentElement).getPropertyValue('--player-time-display-color-dark') : style.getPropertyValue('--player-text-color')));
+
+                const thumbColor = themeConfig.seekBarThumb || (isDark ? '#bbb' : 'white');
+                style.setProperty('--player-seekbar-thumb-color', thumbColor);
+                if (typeof chroma === 'function' && Utils.isValidColor(thumbColor)) {
+                    style.setProperty('--player-seekbar-track-color', chroma(thumbColor).alpha(isDark ? 0.4 : 0.3).hex());
+                    style.setProperty('--player-seekbar-track-hover-color', chroma(thumbColor).alpha(isDark ? 0.6 : 0.5).hex());
+                    style.setProperty('--player-seekbar-thumb-shadow-color', chroma(thumbColor).alpha(0.9).hex());
+                } else { 
+                    style.setProperty('--player-seekbar-track-color', isDark ? 'rgba(180,180,180,0.4)' : 'rgba(255,255,255,0.3)');
+                    style.setProperty('--player-seekbar-track-hover-color', isDark ? 'rgba(180,180,180,0.6)' : 'rgba(255,255,255,0.5)');
+                    style.setProperty('--player-seekbar-thumb-shadow-color', isDark ? 'rgba(180,180,180,0.9)' : 'rgba(255,255,255,0.9)');
+                }
+                
+                const defaultButtonBg = themeConfig.playerBoxBg !== 'transparent' ? (themeConfig.playerBoxText || (isDark ? '#444' : '#ddd')) : 'transparent';
+                const defaultButtonTextColor = themeConfig.playerBoxBg !== 'transparent' ? Utils.getContrastingTextColor(defaultButtonBg) : (themeConfig.mainTextColor || (isDark ? '#e0e0e0' : 'white'));
+                const defaultButtonBorderColor = defaultButtonTextColor;
+
+                style.setProperty('--player-button-bg', themeConfig.buttonBg || defaultButtonBg);
+                style.setProperty('--player-button-text-color', themeConfig.buttonTextColor || defaultButtonTextColor);
+                style.setProperty('--player-button-border-color', themeConfig.buttonBorderColor || defaultButtonBorderColor);
+                style.setProperty('--player-button-hover-bg', themeConfig.buttonHoverBg || (typeof chroma === 'function' && Utils.isValidColor(style.getPropertyValue('--player-button-bg')) ? chroma(style.getPropertyValue('--player-button-bg')).brighten(0.5).hex() : (isDark ? '#555' : 'rgba(255,255,255,0.3)')));
+
+                const playPauseBg = themeConfig.seekBarThumb || (isDark ? '#bb86fc' : '#007BFF'); 
+                style.setProperty('--player-playpause-button-bg', playPauseBg);
+                style.setProperty('--player-playpause-button-text-color', Utils.getContrastingTextColor(playPauseBg));
+
+                style.setProperty('--player-logo-spin-animation', themeConfig.logoSpin || 'spin-default');
+            },
+            loadTrack: (elements, trackData, themeConfig) => {
+                if (!elements.audio || !trackData || !elements.titleEl) return;
+                elements.titleEl.textContent = trackData.title;
+                elements.artistEl.textContent = trackData.artist;
+                elements.audio.src = trackData.src;
+                elements.audio.load(); 
+
+                if (elements.seekBar) elements.seekBar.value = 0;
+                if (elements.currentTimeEl) elements.currentTimeEl.textContent = Utils.formatTime(0);
+                if (elements.totalDurationEl) elements.totalDurationEl.textContent = Utils.formatTime(0); 
+                if (elements.playPauseBtn) elements.playPauseBtn.textContent = '►';
+                if (elements.logoBg) elements.logoBg.classList.remove('playing');
+                
+                PlayerManager.applyThemeStyles(elements, themeConfig);
+            },
+            togglePlayPause: (elements) => {
+                if (!elements.audio || !elements.playPauseBtn) return;
+                if (elements.audio.paused || elements.audio.ended) {
+                    elements.audio.play()
+                        .then(() => {
+                            elements.playPauseBtn.textContent = '❚❚'; 
+                            if (elements.logoBg) elements.logoBg.classList.add('playing');
+                        })
+                        .catch(e => console.error(`Player (${elements.container ? elements.container.id : 'N/A'}) play error:`, e));
+                } else {
+                    elements.audio.pause();
+                    elements.playPauseBtn.textContent = '►'; 
+                    if (elements.logoBg) elements.logoBg.classList.remove('playing');
+                }
+            },
+            setupEventListeners: (elements, playerType, config) => {
+                if (!elements.audio || !elements.playPauseBtn || !elements.seekBar) return;
+
+                const clearAndAdd = (el, event, handler) => {
+                    if (el._eventHandlers && el._eventHandlers[event]) {
+                        el.removeEventListener(event, el._eventHandlers[event]);
+                    }
+                    if (!el._eventHandlers) el._eventHandlers = {};
+                    el._eventHandlers[event] = handler;
+                    el.addEventListener(event, handler);
+                };
+                
+                clearAndAdd(elements.playPauseBtn, 'click', () => PlayerManager.togglePlayPause(elements));
+
+                const setupInteractiveButton = (button, secretTriggerKey, action) => {
+                    if (button) {
+                         clearAndAdd(button, 'click', () => {
+                            if (secretTriggerKey) SecretManager.handleTrigger(secretTriggerKey);
+                            action();
+                        });
+                    }
+                };
+
+                if (playerType === 'main') {
+                    setupInteractiveButton(elements.nextBtn, 'playerNext', () => 
+                        PlayerManager.switchToPlayer((State.currentPlayerIndex + 1) % PLAYERS_DATA.length, 'main')
+                    );
+                    setupInteractiveButton(elements.prevBtn, 'playerPrev', () => 
+                        PlayerManager.switchToPlayer((State.currentPlayerIndex - 1 + PLAYERS_DATA.length) % PLAYERS_DATA.length, 'main')
+                    );
+                     if(elements.logoImg) { 
+                        setupInteractiveButton(elements.logoImg, 'playerLogo', () => {}); 
+                    }
+                } else if (playerType === 'secret') {
+                    setupInteractiveButton(elements.nextBtn, null, () => { 
+                        if (elements.container) elements.container.style.display = 'none';
+                        if (elements.audio && !elements.audio.paused) elements.audio.pause();
+                        PlayerManager.switchToPlayer(State.currentPlayerIndex, 'main'); 
+                    });
+                    if (elements.prevBtn) elements.prevBtn.style.display = 'none'; 
+                }
+
+                const audio = elements.audio;
+                clearAndAdd(audio, 'timeupdate', () => {
+                    if (!isNaN(audio.duration) && elements.seekBar && elements.currentTimeEl) {
+                        elements.seekBar.value = audio.currentTime;
+                        elements.currentTimeEl.textContent = Utils.formatTime(audio.currentTime);
+                    }
+                });
+                clearAndAdd(audio, 'loadedmetadata', () => {
+                    if (!isNaN(audio.duration) && elements.totalDurationEl && elements.seekBar) {
+                        elements.totalDurationEl.textContent = Utils.formatTime(audio.duration);
+                        elements.seekBar.max = audio.duration;
+                    } else {
+                        if(elements.totalDurationEl) elements.totalDurationEl.textContent = "N/A";
+                        if(elements.seekBar) elements.seekBar.max = 0;
+                    }
+                });
+                clearAndAdd(audio, 'ended', () => {
+                    if (elements.playPauseBtn) elements.playPauseBtn.textContent = '►';
+                    if (elements.logoBg) elements.logoBg.classList.remove('playing');
+                    if (elements.seekBar) elements.seekBar.value = 0; 
+                    if (playerType === 'secret') { 
+                        if (elements.container) elements.container.style.display = 'none';
+                        PlayerManager.switchToPlayer(State.currentPlayerIndex, 'main');
+                    }
+                });
+
+                clearAndAdd(elements.seekBar, 'input', () => { 
+                    if (!isNaN(elements.audio.duration)) elements.audio.currentTime = elements.seekBar.value;
+                });
+                 clearAndAdd(elements.seekBar, 'change', () => { 
+                    if (!isNaN(elements.audio.duration)) elements.audio.currentTime = elements.seekBar.value;
+                });
+            },
+            switchToPlayer: (index, type) => {
+                PLAYERS_DATA.forEach(pd => {
+                    const pElements = PlayerManager.getPlayerElements(pd.idPrefix);
+                    if (pElements.container) pElements.container.style.display = 'none';
+                    if (pElements.audio && !pElements.audio.paused) {
+                        pElements.audio.pause();
+                        if (pElements.playPauseBtn) pElements.playPauseBtn.textContent = '►';
+                        if (pElements.logoBg) pElements.logoBg.classList.remove('playing');
+                    }
+                });
+                const secretPlayerElements = PlayerManager.getPlayerElements(SECRET_SONG_PLAYER_ID_PREFIX);
+                if (secretPlayerElements.container && secretPlayerElements.container.style.display !== 'none') {
+                    secretPlayerElements.container.style.display = 'none';
+                    if (secretPlayerElements.audio && !secretPlayerElements.audio.paused) {
+                        secretPlayerElements.audio.pause();
+                         if (secretPlayerElements.playPauseBtn) secretPlayerElements.playPauseBtn.textContent = '►';
+                         if (secretPlayerElements.logoBg) secretPlayerElements.logoBg.classList.remove('playing');
+                    }
+                }
+                
+                State.activePlayerType = type;
+
+                if (type === 'main') {
+                    State.currentPlayerIndex = index;
+                    const playerData = PLAYERS_DATA[index];
+                    if (!playerData) { console.warn(`Player data not found for index: ${index}`); return; }
+                    State.activePlayerConfig = playerData;
+                    State.activePlayerElements = PlayerManager.getPlayerElements(playerData.idPrefix);
+                    
+                    if (State.activePlayerElements.container) {
+                        State.activePlayerElements.container.style.display = 'flex';
+                        PlayerManager.loadTrack(State.activePlayerElements, playerData.track, playerData.theme);
+                        PlayerManager.setupEventListeners(State.activePlayerElements, 'main', playerData);
+                    } else {
+                         console.warn(`Container for player ${playerData.idPrefix} not found.`);
+                    }
+                } 
+                 UIManager.applyCurrentDarkModeStyles(); 
+            },
+            playSecretSong: (songDataWithTheme) => {
+                if (State.activePlayerType === 'main' && State.activePlayerElements.container) {
+                    State.activePlayerElements.container.style.display = 'none';
+                    if (State.activePlayerElements.audio && !State.activePlayerElements.audio.paused) {
+                        State.activePlayerElements.audio.pause();
+                        if(State.activePlayerElements.playPauseBtn) State.activePlayerElements.playPauseBtn.textContent = '►';
+                        if(State.activePlayerElements.logoBg) State.activePlayerElements.logoBg.classList.remove('playing');
+                    }
+                }
+
+                const secretElements = PlayerManager.getPlayerElements(SECRET_SONG_PLAYER_ID_PREFIX);
+                if (!secretElements.container) { console.error("Secret song player container not found!"); return; }
+                
+                if (songDataWithTheme && songDataWithTheme.src) {
+                    const themeForSecret = songDataWithTheme.theme || {}; 
+                    State.activePlayerConfig = { track: songDataWithTheme, theme: themeForSecret, idPrefix: SECRET_SONG_PLAYER_ID_PREFIX };
+                    State.activePlayerElements = secretElements;
+                    State.activePlayerType = 'secret';
+                    
+                    secretElements.container.style.display = 'flex';
+                    PlayerManager.loadTrack(secretElements, songDataWithTheme, themeForSecret);
+                    PlayerManager.setupEventListeners(secretElements, 'secret', State.activePlayerConfig);
+                    
+                    setTimeout(() => { 
+                        if (secretElements.audio && secretElements.audio.paused) {
+                            PlayerManager.togglePlayPause(secretElements);
+                        }
+                    }, 100);
+                }
+                UIManager.applyCurrentDarkModeStyles();
+            }
+        };
+
+        // --- YouTube Player ---
+        const YouTubePlayer = {
+            isAPIReady: false,
+            init: () => {
+                window.onYouTubeIframeAPIReady = () => {
+                    YouTubePlayer.isAPIReady = true;
+                    if (Cache.youtubeVideoOverlay.style.display === 'flex' && !State.youtubePlayer) {
+                        YouTubePlayer.createPlayer(YOUTUBE_VIDEO_ID_666);
+                    }
+                };
+            },
+            createPlayer: (videoId) => {
+                if (Cache.youtubeVideoOverlay.style.display === 'none' || Cache.youtubeVideoOverlay.style.display === '') return;
+                if (State.youtubePlayer && typeof State.youtubePlayer.destroy === 'function') {
+                    try { State.youtubePlayer.destroy(); } catch (e) { console.warn("YT Player destroy error", e); }
+                }
+                Cache.youtubePlayerContainer.innerHTML = ''; 
+                const playerDiv = document.createElement('div');
+                playerDiv.id = 'yt-player-actual'; 
+                Cache.youtubePlayerContainer.appendChild(playerDiv);
+
+                State.youtubePlayer = new YT.Player(playerDiv.id, {
+                    height: '100%', width: '100%', videoId: videoId,
+                    playerVars: { 
+                        'autoplay': 1, 'controls': 0, 'showinfo': 0, 'rel': 0, 
+                        'loop': 1, 'playlist': videoId, 
+                        'modestbranding': 1, 'iv_load_policy': 3, 'fs': 0, 'playsinline': 1 
+                    },
+                    events: {
+                        'onReady': YouTubePlayer.onPlayerReady,
+                        'onStateChange': YouTubePlayer.onPlayerStateChange
+                    }
+                });
+            },
+            onPlayerReady: (event) => {
+                event.target.playVideo();
+                event.target.mute(); 
+                const iframe = event.target.getIframe();
+                if (iframe) { 
+                    Object.assign(iframe.style, { position:'absolute', top:'0', left:'0', width:'100%', height:'100%' });
+                }
+            },
+            onPlayerStateChange: (event) => {
+                if (event.data === YT.PlayerState.ENDED) { 
+                    State.youtubePlayer.seekTo(0);
+                    State.youtubePlayer.playVideo();
+                }
+            },
+            showVideo: () => {
+                if (Cache.youtubeVideoOverlay) {
+                    Cache.youtubeVideoOverlay.style.display = 'flex';
+                    if (!YouTubePlayer.isAPIReady || typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+                         console.warn("YouTube API not ready, deferring player creation.");
+                         return; 
+                    }
+                    YouTubePlayer.createPlayer(YOUTUBE_VIDEO_ID_666);
+                }
+            }
+        };
+        YouTubePlayer.init(); 
+
+        // --- Secret Triggers Management ---
+        const SecretManager = {
+            handleTrigger: (key) => {
+                if (SECRET_SONG_TRIGGERS[key]) {
+                    SECRET_SONG_TRIGGERS[key].count++;
+                    for (const k in SECRET_SONG_TRIGGERS) {
+                        if (k !== key) SECRET_SONG_TRIGGERS[k].count = 0;
+                    }
+                    State.calcMultiplyClicks = 0; 
+                    State.calcDivideClicks = 0;
+
+                    if (SECRET_SONG_TRIGGERS[key].count >= SECRET_SONG_TRIGGERS[key].threshold) {
+                        PlayerManager.playSecretSong(SECRET_SONG_TRIGGERS[key].song);
+                        SECRET_SONG_TRIGGERS[key].count = 0; 
+                    }
+                }
+            }
+        };
+
+        // --- Event Listener Setup ---
+        const setupEventListeners = () => {
+            if (Cache.startStoryButton) {
+                Cache.startStoryButton.addEventListener('click', () => {
+                    if (Cache.introSection) {
+                        Cache.introSection.classList.add('is-exiting');
+                        if (Cache.darkModeToggleButton) Cache.darkModeToggleButton.style.display = 'flex';
+                        
+                        const handleIntroTransitionEnd = () => {
+                            Cache.introSection.style.display = 'none';
+                            Cache.introSection.removeEventListener('transitionend', handleIntroTransitionEnd);
+
+                            if (Cache.mainContent) {
+                                Cache.mainContent.style.display = 'block'; 
+                                Cache.mainContent.classList.add('is-entering');
+                                UIManager.setWidgetVisibility(true); 
+                                UIManager.applyCurrentDarkModeStyles(); 
+                            }
+                            if (Cache.nextButtonMainPage) UIManager.startButtonTimer(Cache.nextButtonMainPage, 480); 
+                        };
+                        Cache.introSection.addEventListener('transitionend', handleIntroTransitionEnd);
+                    }
+                });
+            }
+
+            if (Cache.nextButtonMainPage) {
+                Cache.nextButtonMainPage.addEventListener('click', () => {
+                    if (!Cache.nextButtonMainPage.disabled) {
+                         window.location.href = 'https://codei81224.vercel.app/';
+                    }
+                });
+            }
+
+            if (Cache.calcButtonsContainer) {
+                Cache.calcButtonsContainer.addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (!button) return;
+                    const value = button.textContent.trim();
+                    Calculator.handleInput(value);
+
+                    if (value === '*') {
+                        State.calcMultiplyClicks++; State.calcDivideClicks = 0;
+                        for (const k in SECRET_SONG_TRIGGERS) SECRET_SONG_TRIGGERS[k].count = 0; 
+                        if (State.calcMultiplyClicks >= 24) {
+                            PlayerManager.playSecretSong({ title: "653 × 5 - 0.5", artist: "Adzan", src: "sweet.mp3", theme: { color: 'black', glow: '#444', playerBoxBg: 'rgba(20,20,20,0.85)', playerBoxText: 'white', seekBarThumb: '#E0E0E0', mainTextColor: 'white', logoSpin: 'spin-secret-song-player' }});
+                            State.calcMultiplyClicks = 0;
+                        }
+                    } else if (value === '/') {
+                        State.calcDivideClicks++; State.calcMultiplyClicks = 0;
+                        for (const k in SECRET_SONG_TRIGGERS) SECRET_SONG_TRIGGERS[k].count = 0;
+                        if (State.calcDivideClicks >= 24) {
+                             PlayerManager.playSecretSong({ title: "Fufufafa fufufafa fufuf", artist: "Adzan", src: "morse.mp3", theme: {color: 'linear-gradient(to right, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF)', glow: 'rgba(255,255,255,0.4)', playerBoxBg: 'rgba(0,0,0,0.45)', playerBoxText: 'white', seekBarThumb: 'white', mainTextColor: 'white', logoSpin: 'spin-secret-song-player' }});
+                            State.calcDivideClicks = 0;
+                        }
+                    } else if (value === 'C') { 
+                        State.calcMultiplyClicks = 0; State.calcDivideClicks = 0; 
+                        SecretManager.handleTrigger('clearCalc');
+                    } else if (value === '.') {
+                        SecretManager.handleTrigger('dotCalc');
+                    } else if (isNaN(parseFloat(value))) { 
+                        State.calcMultiplyClicks = 0; State.calcDivideClicks = 0;
+                    }
+                });
+            }
+
+            if (Cache.dateTimeLogo) {
+                Cache.dateTimeLogo.addEventListener('click', () => {
+                    State.dateTimeLogoClickCount++;
+                    if (State.dateTimeLogoClickCount === 1) { 
+                        const originalStyles = { bg: Cache.body.style.background, img: Cache.body.style.backgroundImage, c: Cache.body.style.backgroundColor, clr: Cache.body.style.color };
+                        Cache.body.style.background = 'red'; Cache.body.style.backgroundImage = 'none'; Cache.body.style.color = 'black';
+                        setTimeout(() => {
+                            Cache.body.style.background = originalStyles.bg; Cache.body.style.backgroundImage = originalStyles.img; 
+                            Cache.body.style.backgroundColor = originalStyles.c; Cache.body.style.color = originalStyles.clr;
+                            if (!State.isDarkMode && !originalStyles.c && !originalStyles.img) Cache.body.style.backgroundImage = getComputedStyle(document.documentElement).getPropertyValue('--bg-gradient-light');
+                             UIManager.applyCurrentDarkModeStyles();
+                        }, 1000); 
+                    }
+                    if (State.dateTimeLogoClickCount >= 5) Effects.triggerScaryEffectDateTime(); 
+                    SecretManager.handleTrigger('dateTime');
+                });
+            }
+            if (Cache.darkModeToggleButton) {
+                Cache.darkModeToggleButton.addEventListener('click', Utils.debounce(UIManager.toggleDarkMode, 150));
+            }
+
+            // MODIFICATION: Event listener for Cache.aetherxLogoInStory (logo in Bab 1)
+            // has been REMOVED. The default <a> tag behavior will now apply,
+            // directly navigating to the form.
+
+        };
+
+        // --- Initialization ---
+        const init = () => {
+            try {
+                if (localStorage.getItem('darkMode') === 'enabled') {
+                    Cache.body.classList.add('dark-mode');
+                }
+            } catch (e) { console.warn("Could not access localStorage for dark mode.", e); }
+            
+            UIManager.applyCurrentDarkModeStyles(); 
+
+            if (Cache.introSection && getComputedStyle(Cache.introSection).display !== 'none') {
+                if (Cache.darkModeToggleButton) Cache.darkModeToggleButton.style.display = 'none';
+                UIManager.setWidgetVisibility(false);
+            } else { 
+                if (Cache.darkModeToggleButton) Cache.darkModeToggleButton.style.display = 'flex';
+                UIManager.setWidgetVisibility(true);
+                 if (Cache.mainContent) Cache.mainContent.style.display = 'block'; 
+                 if (Cache.nextButtonMainPage) UIManager.startButtonTimer(Cache.nextButtonMainPage, 480);
+            }
+
+            if (Cache.dateTimeLogo && !Cache.dateTimeLogo.querySelector('#date-time-label')) {
+                 const dateLabel = document.createElement('div');
+                 dateLabel.id = 'date-time-label';
+                 dateLabel.textContent = "8 December 2024"; 
+                 Cache.dateTimeLogo.prepend(dateLabel);
+            }
+
+            if (PLAYERS_DATA.length > 0) {
+                PlayerManager.switchToPlayer(0, 'main');
+            } else {
+                console.warn("No player data found. Music players will not be initialized.");
+            }
+
+            if (Cache.fireBackground) setInterval(UIManager.createFireNumber, 250); 
+            if (Cache.countdownElement) {
+                UIManager.updateMainCountdown(); 
+                setInterval(UIManager.updateMainCountdown, 1000);
+            }
+            
+            Effects.preventScreenshotAndRecording();
+            setTimeout(UIManager.showScaryOverlayText, 12000); 
+
+            if (typeof chroma !== 'function') {
+                console.warn("Chroma.js library is not loaded. Some dynamic color functionalities might be affected.");
+            }
+            
+            setupEventListeners();
+            console.log("Aether's site initialized.");
+        };
+
+        init(); 
+    });
+  </script>
+</body>
+</html>
